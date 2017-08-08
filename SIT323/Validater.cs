@@ -95,7 +95,7 @@ namespace SIT323
             const String RE_commentBehind = "^\\S+.*//.*$";
 
             // LOGFILE_NAME="log.txt".
-            const String RE_logFile = "^LOGFILE_NAME=\"\\w+.\\w+\"$";
+            const String RE_logFile = "^LOGFILE_NAME=\".+\"$";
             dataContent[0] = "LOGFILE_NAME";
 
             // MINIMUM_NUMBER_OF_UNIQUE_WORDS=10.
@@ -599,6 +599,7 @@ namespace SIT323
                 }
 
             }
+
             // Check if every data appears.
             for(int i = 0; i < Total; i++)
             {
@@ -608,6 +609,7 @@ namespace SIT323
                     isValid = false;
                 }
             }
+
             return isValid;
         }
 
@@ -620,57 +622,162 @@ namespace SIT323
              */
 
             bool isValid = true;
-            const String RE_validMatch = "^[a-zA-Z]+$";
-            // Separated by commas, from the start to the end of a word contains only more than 1 letter.
 
-            List<String> wordList = new List<string>();
+            // Total types of data.
+            const int Total = 6;
 
-            // To show the position of invalid word.
+            // Connect number of data with its content.
+            String[] dataContent = new String[Total];
+
+            // Whole line is a comment.
+            const String RE_commentLine = @"^//.*$";
+
+            // Has comment in the end of the line.
+            const String RE_commentBehind = "^\\S+.*//.*$";
+
+            // CONFIGURATION_FILE.
+            const String RE_configFile = "^CONFIGURATION_FILE=\".+\"$";
+            dataContent[0] = "CONFIGURATION_FILE";
+
+            // WORDLIST_FILE.
+            const String RE_wordlistFile = "^WORDLIST_FILE=\".+\"$";
+            dataContent[1] = "WORDLIST_FILE";
+
+            // The number of rows and columns.
+            const String RE_rows = "^ROWS=\\d+$";
+            const String RE_cols = "^COLUMNS=\\d+$";
+            dataContent[2] = "ROWS";
+            dataContent[3] = "COLUMNS";
+
+            // The horizontal rows containing words.
+            const String RE_horizentalWords = "^ROW=\\d+,[A-Z]+,\\d+$";
+            dataContent[4] = "HorizentalWords";
+
+            // The vertical rows containing words.
+            const String RE_verticalWords = "^COLUMN=\\d+,[A-Z]+,\\d+$";
+            dataContent[5] = "VerticalWords";
+
+            // To show the invalid line.
             int timeInRow = 0;
-            int timeInCol = 0;
+
+            // Row of dataChecker is dataLine; Column of dataChecker is the time data appear;
+            // To ensure no dumplicated data and every data exists.
+            int[,] dataChecker = new int[Total, 2];
+            for (int i = 0; i < Total; i++)
+            {
+                dataChecker[i, 0] = i;
+                dataChecker[i, 1] = 0;
+            }
 
             String[] lines = File.ReadAllLines(path);
             foreach (String line in lines)
             {
+                // Using matchedCount to judge whether the whole file is valid or not.
+                int matchedCount = 0;
+
                 timeInRow++;
 
-                String[] words = line.Split(new char[] { ',' });
-                foreach (String word in words)
-                {
-                    timeInCol++;
+                // Trim and Upper.
+                String ruledLine = line.Trim().ToUpper();
 
-                    // If the word is invalid.
-                    if (!System.Text.RegularExpressions.Regex.IsMatch(word, RE_validMatch))
+                // If is a comment line then ignore.
+                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentLine))
+                {
+                    continue;
+                }
+
+                // If is a space line then ignore.
+                if (String.IsNullOrEmpty(ruledLine.Trim()))
+                {
+                    continue;
+                }
+
+                // If has comment in the end of the line, remove it.
+                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentBehind))
+                {
+                    ruledLine = ruledLine.Remove(ruledLine.IndexOf("//")).Trim();
+                }
+
+                if(System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_configFile))
+                {
+                    matchedCount++;
+                    // If dumplicate.
+                    if (dataChecker[0, 1] > 0)
                     {
+                        Console.WriteLine("{0} row is invalid", timeInRow);
                         isValid = false;
-                        if (String.IsNullOrWhiteSpace(word))
-                        {
-                            Console.WriteLine("Word in {0} row {1} column is empty or white space.", timeInRow, timeInCol);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Word in {0} row {1} column contain non-letter character.", timeInRow, timeInCol);
-                        }
                         continue;
                     }
-
-                    // If the word is a real word.
-                    else
+                    dataChecker[0, 1]++;
+                }
+                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_wordlistFile))
+                {
+                    matchedCount++;
+                    // If dumplicate.
+                    if (dataChecker[1, 1] > 0)
                     {
-                        // If dumplicate.
-                        if (wordList.Contains(word.ToUpper()))
-                        {
-                            isValid = false;
-                            Console.WriteLine("Word in {0} row {1} column is Duplicated.", timeInRow, timeInCol);
-                            continue;
-                        }
-                        else
-                        {
-                            wordList.Add(word.ToUpper());
-                        }
+                        Console.WriteLine("{0} row is invalid", timeInRow);
+                        isValid = false;
+                        continue;
                     }
+                    dataChecker[1, 1]++;
+                }
+                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_rows))
+                {
+                    matchedCount++;
+                    // If dumplicate.
+                    if (dataChecker[2, 1] > 0)
+                    {
+                        Console.WriteLine("{0} row is invalid", timeInRow);
+                        isValid = false;
+                        continue;
+                    }
+                    dataChecker[2, 1]++;
+                }
+                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_cols))
+                {
+                    matchedCount++;
+                    // If dumplicate.
+                    if (dataChecker[3, 1] > 0)
+                    {
+                        Console.WriteLine("{0} row is invalid", timeInRow);
+                        isValid = false;
+                        continue;
+                    }
+                    dataChecker[3, 1]++;
+                }
+                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_horizentalWords))
+                {
+                    matchedCount++;
+                    
+                    dataChecker[4, 1]++;
+                }
+                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_verticalWords))
+                {
+                    matchedCount++;
+                   
+                    dataChecker[5, 1]++;
+                }
+
+                // If notMatchedTime == 0, not matched, invalid.
+                if (matchedCount == 0)
+                {
+                    Console.WriteLine("{0} row is invalid", timeInRow);
+                    isValid = false;
+                    continue;
                 }
             }
+
+            // Check if every data appears.
+            for (int i = 0; i < Total; i++)   
+            {
+                if (dataChecker[i, 1] == 0)
+                {
+                    Console.WriteLine("data {0} is lack or invalid", dataContent[i]);
+                    isValid = false;
+                }
+            }
+
             return isValid;
         }
     }
