@@ -16,21 +16,30 @@ namespace SIT323
             // Separated by commas, from the start to the end of a word contains only more than 1 letter.
 
             List<String> wordList = new List<string>();
-            foreach(String line in File.ReadAllLines(path))
+
+            // To show the position of invalid word.
+            int timeInRow = 0;
+            int timeInCol = 0;
+
+            foreach (String line in File.ReadAllLines(path))
             {
+                timeInRow++;
+
                 foreach(String word in line.Split(new char[] { ',' }))
                 {
+                    timeInCol++;
+
                     // If the word is invalid.
                     if(! System.Text.RegularExpressions.Regex.IsMatch(word, RE_validMatch))
                     {
                         isValid = false;
                         if(String.IsNullOrWhiteSpace(word))
                         {
-                            Console.WriteLine("Invalid word is empty or white space.");
+                            Console.WriteLine("Word in {0} row {1} column is empty or white space.", timeInRow, timeInCol);
                         }
                         else
                         {
-                            Console.WriteLine("Invalid word contain non-letter character.");
+                            Console.WriteLine("Word in {0} row {1} column contain non-letter character.", timeInRow, timeInCol);
                         }
                         continue;
                     }
@@ -39,15 +48,15 @@ namespace SIT323
                     else
                     {
                         // If dumplicate.
-                        if (wordList.Contains(word))
+                        if (wordList.Contains(word.ToUpper()))
                         {
                             isValid = false;
-                            Console.WriteLine("Duplicated words exist.");
+                            Console.WriteLine("Word in {0} row {1} column is Duplicated.", timeInRow, timeInCol);
                             continue;
                         }
                         else
                         {
-                            wordList.Add(word);
+                            wordList.Add(word.ToUpper());
                         }
                     }
                 }
