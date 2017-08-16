@@ -804,17 +804,18 @@ namespace SIT323
             return isValid;
         }
 
-        public bool ValidateCrozzleText(String path)
+        public bool[] ValidateCrozzleText(String path)
         {
             /**
              * This method is to 
              * 1.Validate a Crozzle.txt.
              * 2.Build crozzle array.
              * Parameter is file path.
-             * Return boolean to show if the Crozzle.txt is valid.
+             * Return boolean array to show if the Crozzle.txt and the crozzle is valid.
              */
 
-            bool isValid = true;
+            bool txtIsValid = true;
+            bool crozzleIsValid = true;
 
             // Total types of data.
             const int Total = 6;
@@ -905,7 +906,7 @@ namespace SIT323
                     if (dataChecker[0, 1] > 0)
                     {
                         Console.WriteLine("{0} row is invalid", timeInRow);
-                        isValid = false;
+                        txtIsValid = false;
                         dataChecker[0, 1]++;
                         continue;
                     }
@@ -928,7 +929,7 @@ namespace SIT323
                     if (dataChecker[1, 1] > 0)
                     {
                         Console.WriteLine("{0} row is invalid", timeInRow);
-                        isValid = false;
+                        txtIsValid = false;
                         dataChecker[1, 1]++;
                         continue;
                     }
@@ -947,12 +948,12 @@ namespace SIT323
             if (configPath == null)
             {
                 Console.WriteLine("Lack or invalid configuration path.");
-                isValid = false;
+                txtIsValid = false;
             }
             if (wordlistPath == null)
             {
                 Console.WriteLine("Lack or invalid wordlist path.");
-                isValid = false;
+                txtIsValid = false;
             }
             ValidateConfigText(configPath);
             ValidateWordlist(wordlistPath);
@@ -992,7 +993,7 @@ namespace SIT323
                     if (dataChecker[2, 1] > 0)
                     {
                         Console.WriteLine("{0} row is invalid", timeInRow);
-                        isValid = false;
+                        txtIsValid = false;
                         dataChecker[2, 1]++;
                         continue;
                     }
@@ -1008,7 +1009,7 @@ namespace SIT323
                     {
                         Console.WriteLine("{0} row is invalid", timeInRow);
                         Console.WriteLine("Rows number does not meet the demand of configuration.txt");
-                        isValid = false;
+                        crozzleIsValid = false;
                         continue;
                     }
                     continue;
@@ -1021,7 +1022,7 @@ namespace SIT323
                     if (dataChecker[3, 1] > 0)
                     {
                         Console.WriteLine("{0} row is invalid", timeInRow);
-                        isValid = false;
+                        txtIsValid = false;
                         dataChecker[3, 1]++;
                         continue;
                     }
@@ -1037,7 +1038,7 @@ namespace SIT323
                     {
                         Console.WriteLine("{0} row is invalid", timeInRow);
                         Console.WriteLine("Columns number does not meet the demand of configuration.txt");
-                        isValid = false;
+                        crozzleIsValid = false;
                         continue;
                     }
                     continue;
@@ -1046,12 +1047,12 @@ namespace SIT323
             if (rows == 0)
             {
                 Console.WriteLine("Lack or invalid rows.");
-                isValid = false;
+                txtIsValid = false;
             }
             if (cols == 0)
             {
                 Console.WriteLine("Lack or invalid columns.");
-                isValid = false;
+                txtIsValid = false;
             }
             timeInRow = 0;
 
@@ -1123,7 +1124,7 @@ namespace SIT323
                     {
                         Console.WriteLine("{0} row is invalid", timeInRow);
                         Console.WriteLine("Horizental word overstep the boundary.");
-                        isValid = false;
+                        crozzleIsValid = false;
                         dataChecker[4, 1]++;
                         continue;
                     }
@@ -1151,7 +1152,7 @@ namespace SIT323
                     {
                         Console.WriteLine("{0} row is invalid", timeInRow);
                         Console.WriteLine("Vertical word overstep the boundary.");
-                        isValid = false;
+                        crozzleIsValid = false;
                         dataChecker[5, 1]++;
                         continue;
                     }
@@ -1164,7 +1165,7 @@ namespace SIT323
                 if (matchedCount == 0)
                 {
                     Console.WriteLine("{0} row is invalid", timeInRow);
-                    isValid = false;
+                    txtIsValid = false;
                     continue;
                 }
             }
@@ -1175,7 +1176,7 @@ namespace SIT323
                 if (dataChecker[i, 1] == 0)
                 {
                     Console.WriteLine("data {0} is lack or invalid", dataContent[i]);
-                    isValid = false;
+                    txtIsValid = false;
                 }
             }
 
@@ -1183,52 +1184,52 @@ namespace SIT323
             if(dataChecker[4,1]<Int32.Parse(configDic["MINIMUM_HORIZONTAL_WORDS"]) || dataChecker[4,1]> Int32.Parse(configDic["MAXIMUM_HORIZONTAL_WORDS"]))
             {
                 Console.WriteLine("Horizental words number does not meet the demand of configuration.txt");
-                isValid = false;
+                crozzleIsValid = false;
             }
             // Check vertical words.
             if (dataChecker[4, 1] < Int32.Parse(configDic["MINIMUM_VERTICAL_WORDS"]) || dataChecker[4, 1] > Int32.Parse(configDic["MAXIMUM_VERTICAL_WORDS"]))
             {
                 Console.WriteLine("Vertical words number does not meet the demand of configuration.txt");
-                isValid = false;
+                crozzleIsValid = false;
             }
 
             // Check dumplicated words meet the demand of configuration.
             if(SameElement(wordList)[0] < Int32.Parse(configDic["MINIMUM_NUMBER_OF_THE_SAME_WORD"]) || SameElement(wordList)[1] > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_THE_SAME_WORD"]))
             {
                 Console.WriteLine("Same word number does not meet the demand of configuration.");
-                isValid = false;
+                crozzleIsValid = false;
             }
 
             // Check if there is inside confliction.
             if (hasConflictionInside(horizentalWords))
             {
                 Console.WriteLine("Has confliction in horizental words.");
-                isValid = false;
+                crozzleIsValid = false;
             }
             if (hasConflictionInside(verticalWords))
             {
                 Console.WriteLine("Has confliction in vertical words.");
-                isValid = false;
+                crozzleIsValid = false;
             }
 
             // Check if there is outer confliction.
             if (IntersectingNum(horizentalWords, verticalWords)[2] == 1)
             {
                 Console.WriteLine("Has confliction between vertical and horizental words.");
-                isValid = false;
+                crozzleIsValid = false;
             }
 
             // Check intersecting words meet the demand of configuration.
             if (IntersectingNum(horizentalWords,verticalWords)[0]< Int32.Parse(configDic["MINIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"]) || IntersectingNum(horizentalWords, verticalWords)[1] > Int32.Parse(configDic["MAXIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"]))
             {
                 Console.WriteLine("INTERSECTIONS_IN_HORIZONTAL_WORDS does not meet the demand of configuration");
-                isValid = false;
+                crozzleIsValid = false;
             }
 
             if (IntersectingNum(verticalWords, horizentalWords)[0] < Int32.Parse(configDic["MINIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"]) || IntersectingNum(verticalWords, horizentalWords)[1] > Int32.Parse(configDic["MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"]))
             {
                 Console.WriteLine("INTERSECTIONS_IN_VERTICAL_WORDS does not meet the demand of configuration");
-                isValid = false;
+                crozzleIsValid = false;
             }
 
             // Check word group.
@@ -1245,10 +1246,10 @@ namespace SIT323
             if(groups.Count < Int32.Parse(configDic["MINIMUM_NUMBER_OF_GROUPS"]) || groups.Count > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_GROUPS"]))
             {
                 Console.WriteLine("Word groups number does not meet the demand of configuration");
-                isValid = false;
+                crozzleIsValid = false;
             }
 
-            return isValid;
+            return new bool[] { txtIsValid, crozzleIsValid};
         }
         private static int[] SameElement(List<String> wordList)
         {
