@@ -15,7 +15,7 @@ namespace SIT323
         static void Main()
         {
             Validater v = new Validater();
-            Console.WriteLine(v.ValidateCrozzleText("Test 3 Crozzle.txt"));
+            Console.WriteLine(v.ValidateCrozzleText("TESTCROZZLE.TXT"));
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());

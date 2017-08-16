@@ -1,6 +1,6 @@
 // Log File Configurations.
 // The default log file name.
-LOGFILE_NAME="log.txt"
+LOGFILE_NAME="log.txt"   // log file   
 
 // Word List Configurations.
 // Limits on the size of the word list.
@@ -25,7 +25,7 @@ MAXIMUM_NUMBER_OF_COLUMNS=800
 // Limits on the number of horizontal words and
 // vertical words in a crozzle.
 MINIMUM_HORIZONTAL_WORDS=1
-MAXIMUM_HORIZONTAL_WORDS=6
+MAXIMUM_HORIZONTAL_WORDS=100
 MINIMUM_VERTICAL_WORDS=1
 MAXIMUM_VERTICAL_WORDS=100
 
@@ -39,7 +39,7 @@ MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS=100
 
 // Limits on duplicate words in the crozzle.
 MINIMUM_NUMBER_OF_THE_SAME_WORD=1
-MAXIMUM_NUMBER_OF_THE_SAME_WORD=2
+MAXIMUM_NUMBER_OF_THE_SAME_WORD=1
 
 // Limits on the number of valid word groups.
 MINIMUM_NUMBER_OF_GROUPS=1
@@ -56,6 +56,3 @@ INTERSECTING_POINTS_PER_LETTER="A=1,B=2,C=2,D=2,E=1,F=2,G=2,H=2,I=1,J=4,K=4,L=4,
 // Points per letter that is not at the intersection of
 // a horizontal and vertical word within the crozzle.
 NON_INTERSECTING_POINTS_PER_LETTER="A=0,B=0,C=0,D=0,E=0,F=0,G=0,H=0,I=0,J=0,K=0,L=0,M=0,N=0,O=0,P=0,Q=0,R=0,S=0,T=0,U=0,V=0,W=0,X=0,Y=0,Z=0"
-NON_INTERSECTING_POINTS_PER_LETTER="A=0,B=0,C=0,D=0,E=0,F=0,G=0,H=0,I=0,J=0,K=0,L=0,M=0,N=0,O=0,P=0,Q=0,R=0,S=0,T=0,U=0,V=0,W=0,X=0,Y=0,Z=1"
-
-NON_INTERSECTING_POINTS_PER_LETTER="A=0,B=0,C=0,D=0,E=0,F=0,G=0,H=0,I=0,J=0,K=0,L=0,M=0,N=0,O=0,P=0,Q=0,R=0,S=0,T=0,U=0,V=0,W=0,X=0,Y=0,Z=2"
