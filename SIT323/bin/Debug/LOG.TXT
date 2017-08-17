@@ -1,0 +1,16 @@
+-------------------------Configuration error.
+
+No error.
+
+-------------------------Wordlist error.
+
+No error.
+
+-------------------------Crozzle.txt error.
+
+No error.
+
+-------------------------Crozzle error.
+
+No error.
+

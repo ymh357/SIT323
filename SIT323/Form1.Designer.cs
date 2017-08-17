@@ -30,18 +30,19 @@
         {
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.新建ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.selectFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.validateFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl = new System.Windows.Forms.TabControl();
-            this.ErrorPage = new System.Windows.Forms.TabPage();
             this.CrozzlePage = new System.Windows.Forms.TabPage();
             this.crozzleWebBrowser = new System.Windows.Forms.WebBrowser();
+            this.ErrorPage = new System.Windows.Forms.TabPage();
             this.errorWebBrowser = new System.Windows.Forms.WebBrowser();
+            this.scoreTextBox = new System.Windows.Forms.TextBox();
+            this.scoreLabel = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.tabControl.SuspendLayout();
-            this.ErrorPage.SuspendLayout();
             this.CrozzlePage.SuspendLayout();
+            this.ErrorPage.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -59,23 +60,17 @@
             // 新建ToolStripMenuItem
             // 
             this.新建ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectFileToolStripMenuItem,
             this.validateFileToolStripMenuItem});
             this.新建ToolStripMenuItem.Name = "新建ToolStripMenuItem";
             this.新建ToolStripMenuItem.Size = new System.Drawing.Size(46, 24);
             this.新建ToolStripMenuItem.Text = "File";
             // 
-            // selectFileToolStripMenuItem
-            // 
-            this.selectFileToolStripMenuItem.Name = "selectFileToolStripMenuItem";
-            this.selectFileToolStripMenuItem.Size = new System.Drawing.Size(172, 26);
-            this.selectFileToolStripMenuItem.Text = "Select File";
-            // 
             // validateFileToolStripMenuItem
             // 
             this.validateFileToolStripMenuItem.Name = "validateFileToolStripMenuItem";
-            this.validateFileToolStripMenuItem.Size = new System.Drawing.Size(172, 26);
+            this.validateFileToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
             this.validateFileToolStripMenuItem.Text = "Validate File";
+            this.validateFileToolStripMenuItem.Click += new System.EventHandler(this.validateFileToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
@@ -87,11 +82,31 @@
             // 
             this.tabControl.Controls.Add(this.CrozzlePage);
             this.tabControl.Controls.Add(this.ErrorPage);
-            this.tabControl.Location = new System.Drawing.Point(3, 35);
+            this.tabControl.Location = new System.Drawing.Point(3, 71);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(555, 351);
+            this.tabControl.Size = new System.Drawing.Size(555, 315);
             this.tabControl.TabIndex = 1;
+            // 
+            // CrozzlePage
+            // 
+            this.CrozzlePage.Controls.Add(this.crozzleWebBrowser);
+            this.CrozzlePage.Location = new System.Drawing.Point(4, 25);
+            this.CrozzlePage.Name = "CrozzlePage";
+            this.CrozzlePage.Padding = new System.Windows.Forms.Padding(3);
+            this.CrozzlePage.Size = new System.Drawing.Size(547, 286);
+            this.CrozzlePage.TabIndex = 0;
+            this.CrozzlePage.Text = "Crozzle";
+            this.CrozzlePage.UseVisualStyleBackColor = true;
+            // 
+            // crozzleWebBrowser
+            // 
+            this.crozzleWebBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.crozzleWebBrowser.Location = new System.Drawing.Point(3, 3);
+            this.crozzleWebBrowser.MinimumSize = new System.Drawing.Size(20, 20);
+            this.crozzleWebBrowser.Name = "crozzleWebBrowser";
+            this.crozzleWebBrowser.Size = new System.Drawing.Size(541, 280);
+            this.crozzleWebBrowser.TabIndex = 0;
             // 
             // ErrorPage
             // 
@@ -104,26 +119,6 @@
             this.ErrorPage.Text = "Error";
             this.ErrorPage.UseVisualStyleBackColor = true;
             // 
-            // CrozzlePage
-            // 
-            this.CrozzlePage.Controls.Add(this.crozzleWebBrowser);
-            this.CrozzlePage.Location = new System.Drawing.Point(4, 25);
-            this.CrozzlePage.Name = "CrozzlePage";
-            this.CrozzlePage.Padding = new System.Windows.Forms.Padding(3);
-            this.CrozzlePage.Size = new System.Drawing.Size(547, 322);
-            this.CrozzlePage.TabIndex = 0;
-            this.CrozzlePage.Text = "Crozzle";
-            this.CrozzlePage.UseVisualStyleBackColor = true;
-            // 
-            // crozzleWebBrowser
-            // 
-            this.crozzleWebBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.crozzleWebBrowser.Location = new System.Drawing.Point(3, 3);
-            this.crozzleWebBrowser.MinimumSize = new System.Drawing.Size(20, 20);
-            this.crozzleWebBrowser.Name = "crozzleWebBrowser";
-            this.crozzleWebBrowser.Size = new System.Drawing.Size(541, 316);
-            this.crozzleWebBrowser.TabIndex = 0;
-            // 
             // errorWebBrowser
             // 
             this.errorWebBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -133,11 +128,32 @@
             this.errorWebBrowser.Size = new System.Drawing.Size(541, 316);
             this.errorWebBrowser.TabIndex = 0;
             // 
+            // scoreTextBox
+            // 
+            this.scoreTextBox.Location = new System.Drawing.Point(185, 36);
+            this.scoreTextBox.Name = "scoreTextBox";
+            this.scoreTextBox.Size = new System.Drawing.Size(140, 25);
+            this.scoreTextBox.TabIndex = 2;
+            // 
+            // scoreLabel
+            // 
+            this.scoreLabel.AutoSize = true;
+            this.scoreLabel.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.scoreLabel.ForeColor = System.Drawing.Color.Crimson;
+            this.scoreLabel.Location = new System.Drawing.Point(5, 31);
+            this.scoreLabel.Name = "scoreLabel";
+            this.scoreLabel.Size = new System.Drawing.Size(133, 30);
+            this.scoreLabel.TabIndex = 3;
+            this.scoreLabel.Text = "Score:  ";
+            this.scoreLabel.Click += new System.EventHandler(this.label1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(559, 377);
+            this.Controls.Add(this.scoreLabel);
+            this.Controls.Add(this.scoreTextBox);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
@@ -146,8 +162,8 @@
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.tabControl.ResumeLayout(false);
-            this.ErrorPage.ResumeLayout(false);
             this.CrozzlePage.ResumeLayout(false);
+            this.ErrorPage.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -160,11 +176,12 @@
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.TabControl tabControl;
         private System.Windows.Forms.TabPage ErrorPage;
-        private System.Windows.Forms.ToolStripMenuItem selectFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem validateFileToolStripMenuItem;
         private System.Windows.Forms.TabPage CrozzlePage;
         private System.Windows.Forms.WebBrowser crozzleWebBrowser;
         private System.Windows.Forms.WebBrowser errorWebBrowser;
+        private System.Windows.Forms.TextBox scoreTextBox;
+        private System.Windows.Forms.Label scoreLabel;
     }
 }
 
