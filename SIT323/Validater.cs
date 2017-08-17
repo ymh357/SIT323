@@ -727,7 +727,8 @@ namespace SIT323
             }
             try
             {
-                logPath = configDic["LOGFILE_NAME"].Split('\"')[1];
+                String directory = Path.GetDirectoryName(Path.GetDirectoryName(path));
+                logPath = directory+"/Log Files/"+configDic["LOGFILE_NAME"].Split('\"')[1];
                 File.Delete(logPath);
                 File.AppendAllLines(logPath, configTxtError);
             }
@@ -853,7 +854,9 @@ namespace SIT323
                     }
                     dataChecker[0, 1]++;
                     String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configPath = @rightArr.TrimStart('\"').TrimEnd('\"');
+                    String directory=Path.GetDirectoryName(path);
+                    configPath = directory+rightArr.TrimStart('\"').TrimEnd('\"');
+
                     continue;
                 }
 
@@ -871,7 +874,8 @@ namespace SIT323
                     }
                     dataChecker[1, 1]++;
                     String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    wordlistPath = @rightArr.TrimStart('\"').TrimEnd('\"');
+                    String directory = Path.GetDirectoryName(path);
+                    wordlistPath = directory+rightArr.TrimStart('\"').TrimEnd('\"');
                     continue;
                 }
             }
