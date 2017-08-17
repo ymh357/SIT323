@@ -1,12 +1,3 @@
-E:\FORVS\SIT323\SIT323\bin\Debug\SIT323.exe.config
-E:\FORVS\SIT323\SIT323\bin\Debug\SIT323.exe
-E:\FORVS\SIT323\SIT323\bin\Debug\SIT323.pdb
-E:\FORVS\SIT323\SIT323\obj\Debug\SIT323.csprojResolveAssemblyReference.cache
-E:\FORVS\SIT323\SIT323\obj\Debug\SIT323.Form1.resources
-E:\FORVS\SIT323\SIT323\obj\Debug\SIT323.Properties.Resources.resources
-E:\FORVS\SIT323\SIT323\obj\Debug\SIT323.csproj.GenerateResource.Cache
-E:\FORVS\SIT323\SIT323\obj\Debug\SIT323.exe
-E:\FORVS\SIT323\SIT323\obj\Debug\SIT323.pdb
 E:\SIT323\SIT323\SIT323\bin\Debug\SIT323.exe.config
 E:\SIT323\SIT323\SIT323\bin\Debug\SIT323.exe
 E:\SIT323\SIT323\SIT323\bin\Debug\SIT323.pdb

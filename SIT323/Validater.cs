@@ -1239,6 +1239,10 @@ namespace SIT323
                 /////////////////////
             }
 
+            List<Point>[] gs = devideByCross(points);
+            List<Point> niGroup = gs[0];
+            List<Point> iGroup = gs[1];
+
             // Intersecting letter points dictionary
             Dictionary<char, int> ipDic = new Dictionary<char, int>();
             try
@@ -1249,6 +1253,10 @@ namespace SIT323
                 {
                     String[] tempss = ss[i].Split('=');
                     ipDic.Add(Char.Parse(tempss[0]), Int32.Parse(tempss[1]));
+                }
+                foreach (Point p in iGroup)
+                {
+                    score += ipDic[p.Letter];
                 }
             }
             catch (Exception)
@@ -1267,25 +1275,18 @@ namespace SIT323
                     String[] tempss = ss2[i].Split('=');
                     nipDic.Add(Char.Parse(tempss[0]), Int32.Parse(tempss[1]));
                 }
+                foreach (Point p in niGroup)
+                {
+                    score += nipDic[p.Letter];
+                }
             }
             catch (Exception)
             {
                 //////////////////
             }
 
-            List<Point>[] gs = devideByCross(points);
-            List<Point> niGroup = gs[0];
-            List<Point> iGroup = gs[1];
-
-
-            foreach (Point p in iGroup)
-            {
-                score += ipDic[p.Letter];
-            }
-            foreach(Point p in niGroup)
-            {
-                score += nipDic[p.Letter];
-            }
+            
+            
 
             // Show crozzle.
             List<Point> crozzlePoints = new List<Point>();

@@ -1,0 +1,48 @@
+// File dependencies.
+// Configuraton file.
+CONFIGURATION_FILE=".\Marking 3 Configuration.txt"
+
+// Word list file.
+WORDLIST_FILE=".\Marking 3 Wordlist.txt"
+
+// Crozzle Size.
+// The number of rows and columns.
+ROWS=10       // This crozzle will have 10 rows.
+COLUMNS=10
+
+// Word Data.
+// The horizontal rows containing words.
+ROW=1,GRACE,1
+ROW=2,LE,3
+ROW=3,ANGELA,3
+ROW=4,RONA,1
+ROW=4,VIC,6
+ROW=5,LE,7
+ROW=6,ED,1
+ROW=6,MARY,4
+ROW=6,LE,9
+ROW=7,CATO,3
+ROW=7,LEW,8
+ROW=9,JACK,1
+ROW=9,LE,7
+ROW=10,FREDDY,5
+
+
+// The vertical rows containing words.
+COLUMN=1,GEORGE,1
+COLUMN=2,MAT,8
+COLUMN=3,ALAN,1
+COLUMN=4,CENA,1
+COLUMN=4,MARK,6
+COLUMN=5,MAT,5
+COLUMN=6,BEV,2
+COLUMN=6,ROD,6
+COLUMN=7,LILY,3
+COLUMN=7,LE,9
+COLUMN=8,TRACE,1
+COLUMN=8,ED,9
+COLUMN=9,LEO,6
+COLUMN=10,MATTHEW,1
+COLUMN=10,TY,9
+
+

@@ -73,7 +73,7 @@ namespace SIT323
                 }
                 catch (Exception)
                 {
-                    errorHTML += "<p>" + "LogFile is not correct. So program cannot show the errors. Check the file you opened." + "</p>";
+                    errorHTML += "<p>" + "LogFile path is not correct. So program cannot show the errors. Check the file you opened." + "</p>";
                 }
                 errorHTML += "</body></html>";
 
