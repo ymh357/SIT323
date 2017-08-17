@@ -99,59 +99,86 @@ namespace SIT323
             int timeInRow = 0;
             int timeInCol = 0;
 
-            String[] lines = File.ReadAllLines(path);
-            foreach (String line in lines)
+            try
             {
-                timeInRow++;
-
-                String[] words = line.Split(new char[] { ',' });
-                foreach (String word in words)
+                String[] lines = File.ReadAllLines(path);
+                foreach (String line in lines)
                 {
-                    timeInCol++;
+                    timeInRow++;
 
-                    // If the word is invalid.
-                    if(! System.Text.RegularExpressions.Regex.IsMatch(word, RE_validMatch))
+                    String[] words = line.Split(new char[] { ',' });
+                    foreach (String word in words)
                     {
-                        isValid = false;
-                        if(String.IsNullOrWhiteSpace(word))
-                        {
-                            wordlistError.Add("Word in "+timeInRow+" row "+ timeInCol + " column is empty or white space.\r\n");
-                        }
-                        else
-                        {
-                            wordlistError.Add("Word in " + timeInRow + " row "+ timeInCol +"  column contain non-letter character.\r\n");
-                        }
-                        continue;
-                    }
+                        timeInCol++;
 
-                    // If the word is a real word.
-                    else
-                    {
-                        // If dumplicate.
-                        if (wordList.Contains(word.ToUpper()))
+                        // If the word is invalid.
+                        if(! System.Text.RegularExpressions.Regex.IsMatch(word, RE_validMatch))
                         {
                             isValid = false;
-                            wordlistError.Add("Word in " + timeInRow + " row " + timeInCol + " column is Duplicated.\r\n");
+                            if(String.IsNullOrWhiteSpace(word))
+                            {
+                                wordlistError.Add("Word in "+timeInRow+" row "+ timeInCol + " column is empty or white space.\r\n");
+                            }
+                            else
+                            {
+                                wordlistError.Add("Word in " + timeInRow + " row "+ timeInCol +"  column contain non-letter character.\r\n");
+                            }
                             continue;
                         }
+
+                        // If the word is a real word.
                         else
                         {
-                            wordList.Add(word.ToUpper());
+                            // If dumplicate.
+                            if (wordList.Contains(word.ToUpper()))
+                            {
+                                isValid = false;
+                                wordlistError.Add("Word in " + timeInRow + " row " + timeInCol + " column is Duplicated.\r\n");
+                                continue;
+                            }
+                            else
+                            {
+                                wordList.Add(word.ToUpper());
+                            }
                         }
                     }
                 }
+            }catch(Exception)
+            {
+                wordlistError.Add("Please check Wordlist file path.");
             }
             // If not meet the demand in configuration.txt.
-            if(! (wordList.Count>=Int32.Parse(configDic["MINIMUM_NUMBER_OF_UNIQUE_WORDS"]) && wordList.Count <= Int32.Parse(configDic["MAXIMUM_NUMBER_OF_UNIQUE_WORDS"])))
+            try
             {
-                isValid = false;
-                wordlistError.Add("Words' number does not meet the demand in configuration.txt.\r\n");
+                if (wordList.Count < Int32.Parse(configDic["MINIMUM_NUMBER_OF_UNIQUE_WORDS"]) || wordList.Count > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_UNIQUE_WORDS"]))
+                {
+                    isValid = false;
+                    wordlistError.Add("Words' number does not meet the demand in configuration.txt.\r\n");
+                }
             }
+            catch (Exception)
+            {
+                int i;
+                if(!Int32.TryParse(configDic["MINIMUM_NUMBER_OF_UNIQUE_WORDS"], out i) || !Int32.TryParse(configDic["MAXIMUM_NUMBER_OF_UNIQUE_WORDS"],out i))
+                {
+                    //////////////////////////
+                }
+            }
+
+
+
             if (isValid)
             {
                 wordlistError.Add("No error.\r\n");
             }
-            File.AppendAllLines(logPath, wordlistError);
+            try
+            {
+                File.AppendAllLines(logPath, wordlistError);
+            }
+            catch (Exception)
+            {
+                /////////////////
+            }
 
             return isValid;
         }
@@ -261,419 +288,426 @@ namespace SIT323
             // To show the invalid line.
             int timeInRow = 0;
 
-            String[] lines = File.ReadAllLines(path);
-            foreach (String line in lines)
+            try
             {
-                // To see current row is valid or not.
-                int matchedCount = 0;
 
-                timeInRow++;
-
-                // Trim and Upper.
-                String ruledLine = line.Trim().ToUpper();
-
-                // If is a comment line then ignore.
-                if(System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentLine))
+                String[] lines = File.ReadAllLines(path);
+                foreach (String line in lines)
                 {
-                    continue;
-                }
+                    // To see current row is valid or not.
+                    int matchedCount = 0;
 
-                // If is a space line then ignore.
-                if (String.IsNullOrEmpty(ruledLine.Trim()))
-                {
-                    continue;
-                }
+                    timeInRow++;
 
-                // If has comment in the end of the line, remove it.
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentBehind))
-                {
-                    ruledLine = ruledLine.Remove(ruledLine.IndexOf("//")).Trim();
-                }
+                    // Trim and Upper.
+                    String ruledLine = line.Trim().ToUpper();
 
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_logFile))
-                {
-
-                    // If dumplicate.
-                    if (configDic["LOGFILE_NAME"]!=null)
+                    // If is a comment line then ignore.
+                    if(System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentLine))
                     {
-                        configTxtError.Add(timeInRow+" row is invalid(Dumplicated)\r\n");
-                        isValid = false;
                         continue;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["LOGFILE_NAME"] = rightArr;
-                    matchedCount++;
-                }
+
+                    // If is a space line then ignore.
+                    if (String.IsNullOrEmpty(ruledLine.Trim()))
+                    {
+                        continue;
+                    }
+
+                    // If has comment in the end of the line, remove it.
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentBehind))
+                    {
+                        ruledLine = ruledLine.Remove(ruledLine.IndexOf("//")).Trim();
+                    }
+
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_logFile))
+                    {
+
+                        // If dumplicate.
+                        if (configDic["LOGFILE_NAME"]!=null)
+                        {
+                            configTxtError.Add(timeInRow+" row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["LOGFILE_NAME"] = rightArr;
+                        matchedCount++;
+                    }
               
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minWords))
-                {
-                    // If dumplicate.
-                    if (configDic["MINIMUM_NUMBER_OF_UNIQUE_WORDS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minWords))
                     {
-                        configTxtError.Add(timeInRow+ " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MINIMUM_NUMBER_OF_UNIQUE_WORDS"] != null)
+                        {
+                            configTxtError.Add(timeInRow+ " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MINIMUM_NUMBER_OF_UNIQUE_WORDS"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MINIMUM_NUMBER_OF_UNIQUE_WORDS"] = rightArr;
-                    matchedCount++;
-                }
                
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxWords))
-                {
-                    // If dumplicate.
-                    if (configDic["MAXIMUM_NUMBER_OF_UNIQUE_WORDS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxWords))
                     {
-                        configTxtError.Add(timeInRow+ " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MAXIMUM_NUMBER_OF_UNIQUE_WORDS"] != null)
+                        {
+                            configTxtError.Add(timeInRow+ " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MAXIMUM_NUMBER_OF_UNIQUE_WORDS"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MAXIMUM_NUMBER_OF_UNIQUE_WORDS"] = rightArr;
-                    matchedCount++;
-                }
                 
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_invalidCrozzleScore))
-                {
-                    // If dumplicate.
-                    if (configDic["INVALID_CROZZLE_SCORE"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_invalidCrozzleScore))
                     {
-                        configTxtError.Add(timeInRow+ " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["INVALID_CROZZLE_SCORE"] != null)
+                        {
+                            configTxtError.Add(timeInRow+ " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["INVALID_CROZZLE_SCORE"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["INVALID_CROZZLE_SCORE"] = rightArr;
-                    matchedCount++;
-                }
                
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_upperCase))
-                {
-                    // If dumplicate.
-                    if (configDic["UPPERCASE"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_upperCase))
                     {
-                        configTxtError.Add(timeInRow+ " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["UPPERCASE"] != null)
+                        {
+                            configTxtError.Add(timeInRow+ " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["UPPERCASE"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["UPPERCASE"] = rightArr;
-                    matchedCount++;
-                }
                
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_style))
-                {
-                    // If dumplicate.
-                    if (configDic["STYLE"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_style))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["STYLE"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["STYLE"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["STYLE"] = rightArr;
-                    matchedCount++;
-                }
               
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_bgcolourEmpty))
-                {
-                    // If dumplicate.
-                    if (configDic["BGCOLOUR_EMPTY_TD"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_bgcolourEmpty))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["BGCOLOUR_EMPTY_TD"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["BGCOLOUR_EMPTY_TD"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["BGCOLOUR_EMPTY_TD"] = rightArr;
-                    matchedCount++;
-                }
                 
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_bgcolourNonEmpty))
-                {
-                    // If dumplicate.
-                    if (configDic["BGCOLOUR_NON_EMPTY_TD"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_bgcolourNonEmpty))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["BGCOLOUR_NON_EMPTY_TD"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["BGCOLOUR_NON_EMPTY_TD"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["BGCOLOUR_NON_EMPTY_TD"] = rightArr;
-                    matchedCount++;
-                }
               
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minRows))
-                {
-                    // If dumplicate.
-                    if (configDic["MINIMUM_NUMBER_OF_ROWS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minRows))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MINIMUM_NUMBER_OF_ROWS"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MINIMUM_NUMBER_OF_ROWS"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MINIMUM_NUMBER_OF_ROWS"] = rightArr;
-                    matchedCount++;
-                }
                
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxRows))
-                {
-                    // If dumplicate.
-                    if (configDic["MAXIMUM_NUMBER_OF_ROWS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxRows))
                     {
-                        Console.WriteLine(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MAXIMUM_NUMBER_OF_ROWS"] != null)
+                        {
+                            Console.WriteLine(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MAXIMUM_NUMBER_OF_ROWS"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MAXIMUM_NUMBER_OF_ROWS"] = rightArr;
-                    matchedCount++;
-                }
                
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minCols))
-                {
-                    // If dumplicate.
-                    if (configDic["MINIMUM_NUMBER_OF_COLUMNS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minCols))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MINIMUM_NUMBER_OF_COLUMNS"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MINIMUM_NUMBER_OF_COLUMNS"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MINIMUM_NUMBER_OF_COLUMNS"] = rightArr;
-                    matchedCount++;
-                }
               
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxCols))
-                {
-                    // If dumplicate.
-                    if (configDic["MAXIMUM_NUMBER_OF_COLUMNS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxCols))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MAXIMUM_NUMBER_OF_COLUMNS"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MAXIMUM_NUMBER_OF_COLUMNS"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MAXIMUM_NUMBER_OF_COLUMNS"] = rightArr;
-                    matchedCount++;
-                }
              
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minHor))
-                {
-                    // If dumplicate.
-                    if (configDic["MINIMUM_HORIZONTAL_WORDS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minHor))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MINIMUM_HORIZONTAL_WORDS"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MINIMUM_HORIZONTAL_WORDS"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MINIMUM_HORIZONTAL_WORDS"] = rightArr;
-                    matchedCount++;
-                }
                
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxHor))
-                {
-                    // If dumplicate.
-                    if (configDic["MAXIMUM_HORIZONTAL_WORDS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxHor))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MAXIMUM_HORIZONTAL_WORDS"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MAXIMUM_HORIZONTAL_WORDS"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MAXIMUM_HORIZONTAL_WORDS"] = rightArr;
-                    matchedCount++;
-                }
                
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minVer))
-                {
-                    // If dumplicate.
-                    if (configDic["MINIMUM_VERTICAL_WORDS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minVer))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MINIMUM_VERTICAL_WORDS"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MINIMUM_VERTICAL_WORDS"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MINIMUM_VERTICAL_WORDS"] = rightArr;
-                    matchedCount++;
-                }
                
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxVer))
-                {
-                    // If dumplicate.
-                    if (configDic["MAXIMUM_VERTICAL_WORDS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxVer))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MAXIMUM_VERTICAL_WORDS"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MAXIMUM_VERTICAL_WORDS"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MAXIMUM_VERTICAL_WORDS"] = rightArr;
-                    matchedCount++;
-                }
                 
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minSameWord))
-                {
-                    // If dumplicate.
-                    if (configDic["MINIMUM_NUMBER_OF_THE_SAME_WORD"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minSameWord))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MINIMUM_NUMBER_OF_THE_SAME_WORD"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MINIMUM_NUMBER_OF_THE_SAME_WORD"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MINIMUM_NUMBER_OF_THE_SAME_WORD"] = rightArr;
-                    matchedCount++;
-                }
                 
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxSameWord))
-                {
-                    // If dumplicate.
-                    if (configDic["MAXIMUM_NUMBER_OF_THE_SAME_WORD"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxSameWord))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MAXIMUM_NUMBER_OF_THE_SAME_WORD"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MAXIMUM_NUMBER_OF_THE_SAME_WORD"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MAXIMUM_NUMBER_OF_THE_SAME_WORD"] = rightArr;
-                    matchedCount++;
-                }
                 
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minGroups))
-                {
-                    // If dumplicate.
-                    if (configDic["MINIMUM_NUMBER_OF_GROUPS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minGroups))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MINIMUM_NUMBER_OF_GROUPS"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MINIMUM_NUMBER_OF_GROUPS"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MINIMUM_NUMBER_OF_GROUPS"] = rightArr;
-                    matchedCount++;
-                }
                 
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxGroups))
-                {
-                    // If dumplicate.
-                    if (configDic["MAXIMUM_NUMBER_OF_GROUPS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxGroups))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MAXIMUM_NUMBER_OF_GROUPS"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MAXIMUM_NUMBER_OF_GROUPS"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MAXIMUM_NUMBER_OF_GROUPS"] = rightArr;
-                    matchedCount++;
-                }
                 
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_pointsPerWord))
-                {
-                    // If dumplicate.
-                    if (configDic["POINTS_PER_WORD"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_pointsPerWord))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["POINTS_PER_WORD"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["POINTS_PER_WORD"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["POINTS_PER_WORD"] = rightArr;
-                    matchedCount++;
-                }
                 
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_intersectingPoints))
-                {
-                    // If dumplicate.
-                    if (configDic["INTERSECTING_POINTS_PER_LETTER"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_intersectingPoints))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["INTERSECTING_POINTS_PER_LETTER"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["INTERSECTING_POINTS_PER_LETTER"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["INTERSECTING_POINTS_PER_LETTER"] = rightArr;
-                    matchedCount++;
-                }
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_nonIntersectingPoints))
-                {
-                    // If dumplicate.
-                    if (configDic["NON_INTERSECTING_POINTS_PER_LETTER"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_nonIntersectingPoints))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["NON_INTERSECTING_POINTS_PER_LETTER"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["NON_INTERSECTING_POINTS_PER_LETTER"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["NON_INTERSECTING_POINTS_PER_LETTER"] = rightArr;
-                    matchedCount++;
-                }
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minHIntersections))
-                {
-                    // If dumplicate.
-                    if (configDic["MINIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minHIntersections))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MINIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MINIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MINIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"] = rightArr;
-                    matchedCount++;
-                }
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxHIntersections))
-                {
-                    // If dumplicate.
-                    if (configDic["MAXIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxHIntersections))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MAXIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MAXIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MAXIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"] = rightArr;
-                    matchedCount++;
-                }
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minVIntersections))
-                {
-                    // If dumplicate.
-                    if (configDic["MINIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minVIntersections))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
+                        // If dumplicate.
+                        if (configDic["MINIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["MINIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"] = rightArr;
+                        matchedCount++;
                     }
-                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                    configDic["MINIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"] = rightArr;
-                    matchedCount++;
-                }
-                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxVIntersections))
-                {
-                    // If dumplicate.
-                    if (configDic["MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"] != null)
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_maxVIntersections))
                     {
-                        configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                        isValid = false;
-                        continue;
-                    }
+                        // If dumplicate.
+                        if (configDic["MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            isValid = false;
+                            continue;
+                        }
 
-                    String rightArr=ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        String rightArr=ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     
-                    configDic["MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"] = rightArr;
-                    matchedCount++;
-                }
+                        configDic["MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"] = rightArr;
+                        matchedCount++;
+                    }
 
-                // If notMatchedTime == 0, not matched, invalid.
-                if (matchedCount == 0)
-                {
-                    configTxtError.Add(timeInRow + " row is invalid\r\n");
-                    isValid = false;
-                    continue;
-                }
+                    // If notMatchedTime == 0, not matched, invalid.
+                    if (matchedCount == 0)
+                    {
+                        configTxtError.Add(timeInRow + " row is invalid\r\n");
+                        isValid = false;
+                        continue;
+                    }
 
+                }
+            }catch(Exception)
+            {
+                configTxtError.Add("Please check Configuration file path.");
             }
 
             // Check if every data appears.
@@ -686,13 +720,21 @@ namespace SIT323
                 }
             }
 
+
             if (isValid)
             {
                 configTxtError.Add("No error.\r\n");
             }
-            logPath = configDic["LOGFILE_NAME"].Split('\"')[1];
-            File.Delete(logPath);
-            File.AppendAllLines(logPath, configTxtError);
+            try
+            {
+                logPath = configDic["LOGFILE_NAME"].Split('\"')[1];
+                File.Delete(logPath);
+                File.AppendAllLines(logPath, configTxtError);
+            }
+            catch (Exception)
+            {
+                ////////////////////////
+            }
 
             return isValid;
         }
@@ -844,6 +886,7 @@ namespace SIT323
                 crozzleTxtError.Add("Lack or invalid wordlist path.\r\n");
                 txtIsValid = false;
             }
+           
             ValidateConfigText(configPath);
             ValidateWordlist(wordlistPath);
 
@@ -889,12 +932,19 @@ namespace SIT323
                     dataChecker[2, 1]++;
                     String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     rows = Int32.Parse(rightArr);
-                    if (rows < Int32.Parse(configDic["MINIMUM_NUMBER_OF_ROWS"]) || rows > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_ROWS"]))
+                    try
                     {
-                        crozzleError.Add(timeInRow+ " row is invalid\r\n");
-                        crozzleError.Add("Rows number does not meet the demand of configuration.txt\r\n");
-                        crozzleIsValid = false;
-                        continue;
+                        if (rows < Int32.Parse(configDic["MINIMUM_NUMBER_OF_ROWS"]) || rows > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_ROWS"]))
+                        {
+                            crozzleError.Add(timeInRow + " row is invalid\r\n");
+                            crozzleError.Add("Rows number does not meet the demand of configuration.txt\r\n");
+                            crozzleIsValid = false;
+                            continue;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        //////////////////
                     }
                     continue;
                 }
@@ -913,12 +963,19 @@ namespace SIT323
                     dataChecker[3, 1]++;
                     String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     cols = Int32.Parse(rightArr);
-                    if (cols < Int32.Parse(configDic["MINIMUM_NUMBER_OF_COLUMNS"]) || cols > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_COLUMNS"]))
+                    try
                     {
-                        crozzleError.Add(timeInRow+ " row is invalid\r\n");
-                        crozzleError.Add("Columns number does not meet the demand of configuration.txt\r\n");
-                        crozzleIsValid = false;
-                        continue;
+                        if (cols < Int32.Parse(configDic["MINIMUM_NUMBER_OF_COLUMNS"]) || cols > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_COLUMNS"]))
+                        {
+                            crozzleError.Add(timeInRow + " row is invalid\r\n");
+                            crozzleError.Add("Columns number does not meet the demand of configuration.txt\r\n");
+                            crozzleIsValid = false;
+                            continue;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        ////////////////////////
                     }
                     continue;
                 }
@@ -1060,23 +1117,44 @@ namespace SIT323
             }
 
             // Check horrizental words.
-            if(dataChecker[4,1]<Int32.Parse(configDic["MINIMUM_HORIZONTAL_WORDS"]) || dataChecker[4,1]> Int32.Parse(configDic["MAXIMUM_HORIZONTAL_WORDS"]))
+            try
             {
-                crozzleError.Add("Horizental words number does not meet the demand of configuration.txt\r\n");
-                crozzleIsValid = false;
+                if (dataChecker[4, 1] < Int32.Parse(configDic["MINIMUM_HORIZONTAL_WORDS"]) || dataChecker[4, 1] > Int32.Parse(configDic["MAXIMUM_HORIZONTAL_WORDS"]))
+                {
+                    crozzleError.Add("Horizental words number does not meet the demand of configuration.txt\r\n");
+                    crozzleIsValid = false;
+                }
+            }
+            catch (Exception)
+            {
+                //////////////////
             }
             // Check vertical words.
-            if (dataChecker[4, 1] < Int32.Parse(configDic["MINIMUM_VERTICAL_WORDS"]) || dataChecker[4, 1] > Int32.Parse(configDic["MAXIMUM_VERTICAL_WORDS"]))
+            try
             {
-                crozzleError.Add("Vertical words number does not meet the demand of configuration.txt\r\n");
-                crozzleIsValid = false;
+                if (dataChecker[4, 1] < Int32.Parse(configDic["MINIMUM_VERTICAL_WORDS"]) || dataChecker[4, 1] > Int32.Parse(configDic["MAXIMUM_VERTICAL_WORDS"]))
+                {
+                    crozzleError.Add("Vertical words number does not meet the demand of configuration.txt\r\n");
+                    crozzleIsValid = false;
+                }
+            }
+            catch (Exception)
+            {
+                ////////////////////
             }
 
             // Check dumplicated words meet the demand of configuration.
-            if(SameElement(wordList)[0] < Int32.Parse(configDic["MINIMUM_NUMBER_OF_THE_SAME_WORD"]) || SameElement(wordList)[1] > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_THE_SAME_WORD"]))
+            try
             {
-                crozzleError.Add("Same word number does not meet the demand of configuration.\r\n");
-                crozzleIsValid = false;
+                if (SameElement(wordList)[0] < Int32.Parse(configDic["MINIMUM_NUMBER_OF_THE_SAME_WORD"]) || SameElement(wordList)[1] > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_THE_SAME_WORD"]))
+                {
+                    crozzleError.Add("Same word number does not meet the demand of configuration.\r\n");
+                    crozzleIsValid = false;
+                }
+            }
+            catch (Exception)
+            {
+                ///////////////////////////
             }
 
             // Check if there is inside confliction.
@@ -1099,16 +1177,30 @@ namespace SIT323
             }
 
             // Check intersecting words meet the demand of configuration.
-            if (IntersectingNum(horizentalWords,verticalWords)[0]< Int32.Parse(configDic["MINIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"]) || IntersectingNum(horizentalWords, verticalWords)[1] > Int32.Parse(configDic["MAXIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"]))
+            try
             {
-                crozzleError.Add("INTERSECTIONS_IN_HORIZONTAL_WORDS does not meet the demand of configuration\r\n");
-                crozzleIsValid = false;
+                if (IntersectingNum(horizentalWords, verticalWords)[0] < Int32.Parse(configDic["MINIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"]) || IntersectingNum(horizentalWords, verticalWords)[1] > Int32.Parse(configDic["MAXIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"]))
+                {
+                    crozzleError.Add("INTERSECTIONS_IN_HORIZONTAL_WORDS does not meet the demand of configuration\r\n");
+                    crozzleIsValid = false;
+                }
+            }
+            catch (Exception) 
+            {
+                ///////////////
             }
 
-            if (IntersectingNum(verticalWords, horizentalWords)[0] < Int32.Parse(configDic["MINIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"]) || IntersectingNum(verticalWords, horizentalWords)[1] > Int32.Parse(configDic["MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"]))
+            try
             {
-                crozzleError.Add("INTERSECTIONS_IN_VERTICAL_WORDS does not meet the demand of configuration\r\n");
-                crozzleIsValid = false;
+                if (IntersectingNum(verticalWords, horizentalWords)[0] < Int32.Parse(configDic["MINIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"]) || IntersectingNum(verticalWords, horizentalWords)[1] > Int32.Parse(configDic["MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"]))
+                {
+                    crozzleError.Add("INTERSECTIONS_IN_VERTICAL_WORDS does not meet the demand of configuration\r\n");
+                    crozzleIsValid = false;
+                }
+            }
+            catch (Exception)
+            {
+                /////////////////////
             }
 
             // Check word group.
@@ -1122,35 +1214,63 @@ namespace SIT323
                 points.AddRange(word);
             }
             List<List<Point>> groups = devideIntoGroups(points);
-            if(groups.Count < Int32.Parse(configDic["MINIMUM_NUMBER_OF_GROUPS"]) || groups.Count > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_GROUPS"]))
+            try
             {
-                crozzleError.Add("Word groups number does not meet the demand of configuration\r\n");
-                crozzleIsValid = false;
+                if (groups.Count < Int32.Parse(configDic["MINIMUM_NUMBER_OF_GROUPS"]) || groups.Count > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_GROUPS"]))
+                {
+                    crozzleError.Add("Word groups number does not meet the demand of configuration\r\n");
+                    crozzleIsValid = false;
+                }
+            }
+            catch (Exception)
+            {
+                //////////////////////
             }
 
             // Calculate the score.
             // Points per word.
-            int ppw = Int32.Parse(configDic["POINTS_PER_WORD"]);
-            score += (wordList.Count * ppw);
+            try
+            {
+                int ppw = Int32.Parse(configDic["POINTS_PER_WORD"]);
+                score += (wordList.Count * ppw);
+            }
+            catch (Exception)
+            {
+                /////////////////////
+            }
 
             // Intersecting letter points dictionary
             Dictionary<char, int> ipDic = new Dictionary<char, int>();
-            String tempStr=configDic["INTERSECTING_POINTS_PER_LETTER"];
-            String[] ss=tempStr.Split(new char[] { '\"',','});
-            for (int i = 1; i < 27; i++)
+            try
             {
-                String[] tempss = ss[i].Split('=');
-                ipDic.Add(Char.Parse(tempss[0]), Int32.Parse(tempss[1]));
+                String tempStr = configDic["INTERSECTING_POINTS_PER_LETTER"];
+                String[] ss = tempStr.Split(new char[] { '\"', ',' });
+                for (int i = 1; i < 27; i++)
+                {
+                    String[] tempss = ss[i].Split('=');
+                    ipDic.Add(Char.Parse(tempss[0]), Int32.Parse(tempss[1]));
+                }
+            }
+            catch (Exception)
+            {
+                /////////////////////////////////////
             }
 
             // Non intersecting letter points dictionary
             Dictionary<char, int> nipDic = new Dictionary<char, int>();
-            tempStr = configDic["NON_INTERSECTING_POINTS_PER_LETTER"];
-            ss = tempStr.Split(new char[] { '\"', ',' });
-            for (int i = 1; i < 27; i++)
+            try
             {
-                String[] tempss = ss[i].Split('=');
-                nipDic.Add(Char.Parse(tempss[0]), Int32.Parse(tempss[1]));
+                String tempStr2 = configDic["NON_INTERSECTING_POINTS_PER_LETTER"];
+                String[] ss2 = tempStr2.Split(new char[] { '\"', ',' });
+                for (int i = 1; i < 27; i++)
+                {
+                    String[] tempss = ss2[i].Split('=');
+                    nipDic.Add(Char.Parse(tempss[0]), Int32.Parse(tempss[1]));
+                }
+            }
+            catch (Exception)
+            {
+                //////////////////
             }
 
             List<Point>[] gs = devideByCross(points);
@@ -1195,13 +1315,27 @@ namespace SIT323
             {
                 crozzleTxtError.Add("No error.\r\n");
             }
-            File.AppendAllLines(logPath, crozzleTxtError);
+            try
+            {
+                File.AppendAllLines(logPath, crozzleTxtError);
+            }
+            catch (Exception)
+            {
+                ////////////////////////
+            }
 
             if (crozzleIsValid)
             {
                 crozzleError.Add("No error.\r\n");
             }
-            File.AppendAllLines(logPath, crozzleError);
+            try
+            {
+                File.AppendAllLines(logPath, crozzleError);
+            }
+            catch (Exception)
+            {
+                ////////////////////////////////
+            }
 
             return new bool[] { txtIsValid, crozzleIsValid };
         }

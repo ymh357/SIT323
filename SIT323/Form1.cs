@@ -63,10 +63,17 @@ namespace SIT323
                 crozzleWebBrowser.DocumentText = crozzleHTML;
 
                 String errorHTML = @"<!DOCTYPE html><html><head></head><body>";
-                String[] errorLines=File.ReadAllLines(validater.LogPath);
-                foreach(String line in errorLines)
+                try
                 {
-                    errorHTML += "<p>" + line +"</p>";
+                    String[] errorLines = File.ReadAllLines(validater.LogPath);
+                    foreach (String line in errorLines)
+                    {
+                        errorHTML += "<p>" + line + "</p>";
+                    }
+                }
+                catch (Exception)
+                {
+                    errorHTML += "<p>" + "LogFile is not correct. So program cannot show the errors. Check the file you opened." + "</p>";
                 }
                 errorHTML += "</body></html>";
 
@@ -77,6 +84,11 @@ namespace SIT323
         }
 
         private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void scoreTextBox_TextChanged(object sender, EventArgs e)
         {
 
         }

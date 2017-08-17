@@ -114,7 +114,7 @@
             this.ErrorPage.Location = new System.Drawing.Point(4, 25);
             this.ErrorPage.Name = "ErrorPage";
             this.ErrorPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ErrorPage.Size = new System.Drawing.Size(547, 322);
+            this.ErrorPage.Size = new System.Drawing.Size(547, 286);
             this.ErrorPage.TabIndex = 1;
             this.ErrorPage.Text = "Error";
             this.ErrorPage.UseVisualStyleBackColor = true;
@@ -125,15 +125,18 @@
             this.errorWebBrowser.Location = new System.Drawing.Point(3, 3);
             this.errorWebBrowser.MinimumSize = new System.Drawing.Size(20, 20);
             this.errorWebBrowser.Name = "errorWebBrowser";
-            this.errorWebBrowser.Size = new System.Drawing.Size(541, 316);
+            this.errorWebBrowser.Size = new System.Drawing.Size(541, 280);
             this.errorWebBrowser.TabIndex = 0;
             // 
             // scoreTextBox
             // 
+            this.scoreTextBox.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.scoreTextBox.Location = new System.Drawing.Point(185, 36);
             this.scoreTextBox.Name = "scoreTextBox";
+            this.scoreTextBox.ReadOnly = true;
             this.scoreTextBox.Size = new System.Drawing.Size(140, 25);
             this.scoreTextBox.TabIndex = 2;
+            this.scoreTextBox.TextChanged += new System.EventHandler(this.scoreTextBox_TextChanged);
             // 
             // scoreLabel
             // 
