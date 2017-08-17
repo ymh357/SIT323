@@ -10,6 +10,8 @@ namespace SIT323
     class Validater
     {
         private Dictionary<String,String> configDic=null;
+        private int score=0;
+
 
         public Validater()
         {
@@ -235,10 +237,10 @@ namespace SIT323
             const String RE_pointsPerWord = "^POINTS_PER_WORD=\\d+$";
 
             // INTERSECTING_POINTS_PER_LETTER="A=1,B=2,C=2,D=2,E=1,F=2,G=2,H=2,I=1,J=4,K=4,L=4,M=4,N=4,O=1,P=8,Q=8,R=8,S=8,T=8,U=1,V=16,W=16,X=32,Y=32,Z=64".
-            const String RE_intersectingPoints = "^INTERSECTING_POINTS_PER_LETTER=\"([A-Z]=-?\\d+,){25,25}([A-Z]=-?\\d+)\"$";
+            const String RE_intersectingPoints = "^INTERSECTING_POINTS_PER_LETTER=\"A=-?\\d+,B=-?\\d+,C=-?\\d+,D=-?\\d+,E=-?\\d+,F=-?\\d+,G=-?\\d+,H=-?\\d+,I=-?\\d+,J=-?\\d+,K=-?\\d+,L=-?\\d+,M=-?\\d+,N=-?\\d+,O=-?\\d+,P=-?\\d+,Q=-?\\d+,R=-?\\d+,S=-?\\d+,T=-?\\d+,U=-?\\d+,V=-?\\d+,W=-?\\d+,X=-?\\d+,Y=-?\\d+,Z=-?\\d+\"$";
 
             // NON_INTERSECTING_POINTS_PER_LETTER="A=1,B=2,C=2,D=2,E=1,F=2,G=2,H=2,I=1,J=4,K=4,L=4,M=4,N=4,O=1,P=8,Q=8,R=8,S=8,T=8,U=1,V=16,W=16,X=32,Y=32,Z=64".
-            const String RE_nonIntersectingPoints = "^NON_INTERSECTING_POINTS_PER_LETTER=\"([A-Z]=-?\\d+,){25,25}([A-Z]=-?\\d+)\"$";
+            const String RE_nonIntersectingPoints = "^NON_INTERSECTING_POINTS_PER_LETTER=\"A=-?\\d+,B=-?\\d+,C=-?\\d+,D=-?\\d+,E=-?\\d+,F=-?\\d+,G=-?\\d+,H=-?\\d+,I=-?\\d+,J=-?\\d+,K=-?\\d+,L=-?\\d+,M=-?\\d+,N=-?\\d+,O=-?\\d+,P=-?\\d+,Q=-?\\d+,R=-?\\d+,S=-?\\d+,T=-?\\d+,U=-?\\d+,V=-?\\d+,W=-?\\d+,X=-?\\d+,Y=-?\\d+,Z=-?\\d+\"$";
 
             // To show the invalid line.
             int timeInRow = 0;
@@ -282,12 +284,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr=ruledLine.Split('=');
-                    String rightArr = null;
-                    for(int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["LOGFILE_NAME"] = rightArr;
                     matchedCount++;
                 }
@@ -301,12 +298,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MINIMUM_NUMBER_OF_UNIQUE_WORDS"] = rightArr;
                     matchedCount++;
                 }
@@ -320,12 +312,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MAXIMUM_NUMBER_OF_UNIQUE_WORDS"] = rightArr;
                     matchedCount++;
                 }
@@ -339,12 +326,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["INVALID_CROZZLE_SCORE"] = rightArr;
                     matchedCount++;
                 }
@@ -358,12 +340,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["UPPERCASE"] = rightArr;
                     matchedCount++;
                 }
@@ -377,12 +354,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["STYLE"] = rightArr;
                     matchedCount++;
                 }
@@ -396,12 +368,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["BGCOLOUR_EMPTY_TD"] = rightArr;
                     matchedCount++;
                 }
@@ -415,12 +382,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["BGCOLOUR_NON_EMPTY_TD"] = rightArr;
                     matchedCount++;
                 }
@@ -434,12 +396,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MINIMUM_NUMBER_OF_ROWS"] = rightArr;
                     matchedCount++;
                 }
@@ -453,12 +410,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MAXIMUM_NUMBER_OF_ROWS"] = rightArr;
                     matchedCount++;
                 }
@@ -472,12 +424,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MINIMUM_NUMBER_OF_COLUMNS"] = rightArr;
                     matchedCount++;
                 }
@@ -491,12 +438,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MAXIMUM_NUMBER_OF_COLUMNS"] = rightArr;
                     matchedCount++;
                 }
@@ -510,12 +452,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MINIMUM_HORIZONTAL_WORDS"] = rightArr;
                     matchedCount++;
                 }
@@ -529,12 +466,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MAXIMUM_HORIZONTAL_WORDS"] = rightArr;
                     matchedCount++;
                 }
@@ -548,12 +480,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MINIMUM_VERTICAL_WORDS"] = rightArr;
                     matchedCount++;
                 }
@@ -567,12 +494,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MAXIMUM_VERTICAL_WORDS"] = rightArr;
                     matchedCount++;
                 }
@@ -586,12 +508,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MINIMUM_NUMBER_OF_THE_SAME_WORD"] = rightArr;
                     matchedCount++;
                 }
@@ -605,12 +522,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MAXIMUM_NUMBER_OF_THE_SAME_WORD"] = rightArr;
                     matchedCount++;
                 }
@@ -624,12 +536,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MINIMUM_NUMBER_OF_GROUPS"] = rightArr;
                     matchedCount++;
                 }
@@ -643,12 +550,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MAXIMUM_NUMBER_OF_GROUPS"] = rightArr;
                     matchedCount++;
                 }
@@ -662,12 +564,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["POINTS_PER_WORD"] = rightArr;
                     matchedCount++;
                 }
@@ -681,12 +578,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["INTERSECTING_POINTS_PER_LETTER"] = rightArr;
                     matchedCount++;
                 }
@@ -699,12 +591,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["NON_INTERSECTING_POINTS_PER_LETTER"] = rightArr;
                     matchedCount++;
                 }
@@ -717,12 +604,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MINIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"] = rightArr;
                     matchedCount++;
                 }
@@ -735,12 +617,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MAXIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"] = rightArr;
                     matchedCount++;
                 }
@@ -753,12 +630,7 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configDic["MINIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"] = rightArr;
                     matchedCount++;
                 }
@@ -771,12 +643,9 @@ namespace SIT323
                         isValid = false;
                         continue;
                     }
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+
+                    String rightArr=ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                    
                     configDic["MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"] = rightArr;
                     matchedCount++;
                 }
@@ -810,6 +679,7 @@ namespace SIT323
              * This method is to 
              * 1.Validate a Crozzle.txt.
              * 2.Build crozzle array.
+             * 3.Calculate the score.
              * Parameter is file path.
              * Return boolean array to show if the Crozzle.txt and the crozzle is valid.
              */
@@ -911,12 +781,7 @@ namespace SIT323
                         continue;
                     }
                     dataChecker[0, 1]++;
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     configPath = @rightArr.TrimStart('\"').TrimEnd('\"');
                     continue;
                 }
@@ -934,12 +799,7 @@ namespace SIT323
                         continue;
                     }
                     dataChecker[1, 1]++;
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     wordlistPath = @rightArr.TrimStart('\"').TrimEnd('\"');
                     continue;
                 }
@@ -998,12 +858,7 @@ namespace SIT323
                         continue;
                     }
                     dataChecker[2, 1]++;
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     rows = Int32.Parse(rightArr);
                     if (rows < Int32.Parse(configDic["MINIMUM_NUMBER_OF_ROWS"]) || rows > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_ROWS"]))
                     {
@@ -1027,12 +882,7 @@ namespace SIT323
                         continue;
                     }
                     dataChecker[3, 1]++;
-                    String[] splitedArr = ruledLine.Split('=');
-                    String rightArr = null;
-                    for (int i = 1; i < splitedArr.Length; i++)
-                    {
-                        rightArr += splitedArr[i];
-                    }
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     cols = Int32.Parse(rightArr);
                     if (cols < Int32.Parse(configDic["MINIMUM_NUMBER_OF_COLUMNS"]) || cols > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_COLUMNS"]))
                     {
@@ -1249,7 +1099,54 @@ namespace SIT323
                 crozzleIsValid = false;
             }
 
-            return new bool[] { txtIsValid, crozzleIsValid};
+            // Calculate the score.
+            // Points per word.
+            int ppw = Int32.Parse(configDic["POINTS_PER_WORD"]);
+            score += (wordList.Count * ppw);
+
+            // Intersecting letter points dictionary
+            Dictionary<char, int> ipDic = new Dictionary<char, int>();
+            String tempStr=configDic["INTERSECTING_POINTS_PER_LETTER"];
+            String[] ss=tempStr.Split(new char[] { '\"',','});
+            for (int i = 1; i < 27; i++)
+            {
+                String[] tempss = ss[i].Split('=');
+                ipDic.Add(Char.Parse(tempss[0]), Int32.Parse(tempss[1]));
+            }
+
+            // Non intersecting letter points dictionary
+            Dictionary<char, int> nipDic = new Dictionary<char, int>();
+            tempStr = configDic["NON_INTERSECTING_POINTS_PER_LETTER"];
+            ss = tempStr.Split(new char[] { '\"', ',' });
+            for (int i = 1; i < 27; i++)
+            {
+                String[] tempss = ss[i].Split('=');
+                nipDic.Add(Char.Parse(tempss[0]), Int32.Parse(tempss[1]));
+            }
+
+            List<Point>[] gs = devideByCross(points);
+            List<Point> niGroup = gs[0];
+            List<Point> iGroup = gs[1];
+
+
+            foreach (Point p in iGroup)
+            {
+                score += ipDic[p.Letter];
+            }
+            foreach(Point p in niGroup)
+            {
+                score += nipDic[p.Letter];
+            }
+
+            Console.WriteLine("score:"+score);
+
+            // Show crozzle.
+            List<Point> crozzlePoints = new List<Point>();
+            crozzlePoints.AddRange(iGroup);
+            crozzlePoints.AddRange(niGroup);
+            
+
+            return new bool[] { txtIsValid, crozzleIsValid };
         }
         private static int[] SameElement(List<String> wordList)
         {
@@ -1455,6 +1352,39 @@ namespace SIT323
                 }
             }
             return neighbours;
+        }
+
+        private static List<Point>[] devideByCross(List<Point> points)
+        {
+            /**
+             * This method is to devide points into two groups:
+             * 1. Intersecting points.
+             * 2. NonIntersecting points.
+             * Return List<Point> array. 1st Element is nonIntersecting points. 2nd is intersecting points. Empty if no intersecting points. 
+             */
+
+            List<Point> iGroup = new List<Point>();
+            List<Point> niGroup;
+            List<Point> temp = new List<Point>();
+            temp.AddRange(points);
+
+            for (int i = 0; i < temp.Count; i++)
+            {
+                for (int j = i+1; j < temp.Count; j++)
+                {
+                    if (IsSamePoint(temp[i], temp[j]))
+                    {
+
+                        iGroup.Add(temp[i]);
+                        temp.RemoveAt(j);
+                        temp.RemoveAt(i);
+                        i--;
+                        break;
+                    }
+                }
+            }
+            niGroup = temp;
+            return new List<Point>[] { niGroup, iGroup };
         }
 
         private class Point
