@@ -720,6 +720,96 @@ namespace SIT323
                 }
             }
 
+            try
+            {
+                if(Int32.Parse(configDic["MINIMUM_NUMBER_OF_GROUPS"])> Int32.Parse(configDic["MAXIMUM_NUMBER_OF_GROUPS"]))
+                {
+                    isValid = false;
+                    configTxtError.Add("MINIMUM_NUMBER_OF_GROUPS is larger than MAXIMUM_NUMBER_OF_GROUPS");
+                    String temp=configDic["MINIMUM_NUMBER_OF_GROUPS"];
+                    configDic["MINIMUM_NUMBER_OF_GROUPS"] = configDic["MAXIMUM_NUMBER_OF_GROUPS"];
+                    configDic["MAXIMUM_NUMBER_OF_GROUPS"] = temp;
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+            try
+            {
+                if (Int32.Parse(configDic["MINIMUM_HORIZONTAL_WORDS"]) > Int32.Parse(configDic["MAXIMUM_HORIZONTAL_WORDS"]))
+                {
+                    isValid = false;
+                    configTxtError.Add("MINIMUM_HORIZONTAL_WORDS is larger than MAXIMUM_HORIZONTAL_WORDS");
+                    String temp = configDic["MINIMUM_HORIZONTAL_WORDS"];
+                    configDic["MINIMUM_HORIZONTAL_WORDS"] = configDic["MAXIMUM_HORIZONTAL_WORDS"];
+                    configDic["MAXIMUM_HORIZONTAL_WORDS"] = temp;
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+            try
+            {
+                if (Int32.Parse(configDic["MINIMUM_VERTICAL_WORDS"]) > Int32.Parse(configDic["MAXIMUM_VERTICAL_WORDS"]))
+                {
+                    isValid = false;
+                    configTxtError.Add("MINIMUM_VERTICAL_WORDS is larger than MAXIMUM_VERTICAL_WORDS");
+                    String temp = configDic["MINIMUM_VERTICAL_WORDS"];
+                    configDic["MINIMUM_VERTICAL_WORDS"] = configDic["MAXIMUM_VERTICAL_WORDS"];
+                    configDic["MAXIMUM_VERTICAL_WORDS"] = temp;
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+            try
+            {
+                if (Int32.Parse(configDic["MINIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"]) > Int32.Parse(configDic["MAXIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"]))
+                {
+                    isValid = false;
+                    configTxtError.Add("MINIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS is larger than MAXIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS");
+                    String temp = configDic["MINIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"];
+                    configDic["MINIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"] = configDic["MAXIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"];
+                    configDic["MAXIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"] = temp;
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+            try
+            {
+                if (Int32.Parse(configDic["MINIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"]) > Int32.Parse(configDic["MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"]))
+                {
+                    isValid = false;
+                    configTxtError.Add("MINIMUM_INTERSECTIONS_IN_VERTICAL_WORDS is larger than MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS");
+                    String temp = configDic["MINIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"];
+                    configDic["MINIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"] = configDic["MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"];
+                    configDic["MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"] = temp;
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+            try
+            {
+                if (Int32.Parse(configDic["MINIMUM_NUMBER_OF_THE_SAME_WORD"]) > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_THE_SAME_WORD"]))
+                {
+                    isValid = false;
+                    configTxtError.Add("MINIMUM_NUMBER_OF_THE_SAME_WORD is larger than MAXIMUM_NUMBER_OF_THE_SAME_WORD");
+                    String temp = configDic["MINIMUM_NUMBER_OF_THE_SAME_WORD"];
+                    configDic["MINIMUM_NUMBER_OF_THE_SAME_WORD"] = configDic["MAXIMUM_NUMBER_OF_THE_SAME_WORD"];
+                    configDic["MAXIMUM_NUMBER_OF_THE_SAME_WORD"] = temp;
+                }
+            }
+            catch (Exception)
+            {
+
+            }
 
             if (isValid)
             {
@@ -728,7 +818,7 @@ namespace SIT323
             try
             {
                 String directory = Path.GetDirectoryName(Path.GetDirectoryName(path));
-                logPath = directory+"/Log Files/"+configDic["LOGFILE_NAME"].Split('\"')[1];
+                logPath = directory + "/Log Files/" + configDic["LOGFILE_NAME"].Split('\"')[1];
                 File.Delete(logPath);
                 File.AppendAllLines(logPath, configTxtError);
             }
