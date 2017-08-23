@@ -1,15 +1,93 @@
 -------------------------Configuration error.
 
-MINIMUM_NUMBER_OF_THE_SAME_WORD is larger than MAXIMUM_NUMBER_OF_THE_SAME_WORD
+10 row is invalid
+
+15 row is invalid
+
+18 row is invalid
+
+19 row is invalid
+
+26 row is invalid
+
+30 row is invalid
+
+44 row is invalid
+
+53 row is invalid
+
+data MINIMUM_NUMBER_OF_UNIQUE_WORDS is lack or invalid
+
+data UPPERCASE is lack or invalid
+
+data BGCOLOUR_EMPTY_TD is lack or invalid
+
+data BGCOLOUR_NON_EMPTY_TD is lack or invalid
+
+data MAXIMUM_NUMBER_OF_COLUMNS is lack or invalid
+
+data MINIMUM_HORIZONTAL_WORDS is lack or invalid
+
+data MINIMUM_NUMBER_OF_THE_SAME_WORD is lack or invalid
+
+data POINTS_PER_WORD is lack or invalid
+
 -------------------------Wordlist error.
 
-No error.
+Word in 1 row 1  column contain non-letter character.
+
+Word in 1 row 2  column contain non-letter character.
+
+Word in 1 row 4 column is Dumplicated.
+
+Dumplicate word: BETTY
+Word in 1 row 5 column is empty or white space.
+
+Word in 1 row 6  column contain non-letter character.
+
+Word in 1 row 7  column contain non-letter character.
+
+Word in 1 row 8  column contain non-letter character.
+
+Word in 1 row 9  column contain non-letter character.
+
+Word in 1 row 10  column contain non-letter character.
 
 -------------------------Crozzle.txt error.
 
-No error.
+15 row is invalid
+
+16 row is invalid
+
+17 row is invalid
+
+18 row is invalid
+
+19 row is invalid
+
+20 row is invalid
+
+21 row is invalid
+
+25 row is invalid
+
+30 row is invalid
+
+data HorizentalWords is lack or invalid
 
 -------------------------Crozzle error.
 
-No error.
+10 row is invalid
+
+Rows number does not meet the demand of configuration.txt
+
+27 row is invalid
+
+Vertical word overstep the boundary.
+
+Vertical words number does not meet the demand of configuration.txt
+
+INTERSECTIONS_IN_VERTICAL_WORDS does not meet the demand of configuration
+
+Word groups number does not meet the demand of configuration
 

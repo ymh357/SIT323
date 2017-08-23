@@ -11,15 +11,21 @@ namespace SIT323
     {
         private Dictionary<String,String> configDic=null;
         private int score=0;
-        char[,] crozzleGrid = null;
-        String logPath = null;
+        private char[,] crozzleGrid = null;
+        private String logPath = null;
+        // A boolean array to save information about whether these 4 things are valid or not.
+        private bool[] validInfo= null;
 
         public char[,] CrozzleGrid { get => crozzleGrid;}
         public string LogPath { get => logPath;}
         public int Score { get => score; }
+        public bool[] ValidInfo { get => validInfo;}
+        public Dictionary<string, string> ConfigDic { get => configDic;}
 
         public Validater()
         {
+            validInfo = new bool[] { true, true, true, true };
+
             configDic = new Dictionary<string, string>();
 
             configDic.Add("LOGFILE_NAME",null);
@@ -78,12 +84,12 @@ namespace SIT323
 
         }
 
-        public bool ValidateWordlist(String path)
+        public void ValidateWordlist(String path)
         {
             /**
              * This method is to validate a wordlist.
              * Parameter is file path.
-             * Return boolean to show if the wordlist is valid.
+             * In the end set validInfo boolean to show if the wordlist is valid.
              */
 
             List<String> wordlistError = new List<string>();
@@ -133,7 +139,8 @@ namespace SIT323
                             if (wordList.Contains(word.ToUpper()))
                             {
                                 isValid = false;
-                                wordlistError.Add("Word in " + timeInRow + " row " + timeInCol + " column is Duplicated.\r\n");
+                                wordlistError.Add("Word in " + timeInRow + " row " + timeInCol + " column is Dumplicated.\r\n");
+                                wordlistError.Add("Dumplicate word: "+ word.ToUpper());
                                 continue;
                             }
                             else
@@ -180,17 +187,17 @@ namespace SIT323
                 /////////////////
             }
 
-            return isValid;
+            validInfo[0] = isValid;
         }
 
-        public bool ValidateConfigText(String path)
+        public void ValidateConfigText(String path)
         {
             /**
              * This method is to 
              * 1. Validate a configure text; 
              * 2. Save configurations.
              * Parameter is file path.
-             * Return boolean to show if the configure text is valid.
+             * In the end set validInfo to show if the configure text is valid.
              */
 
             List<String> configTxtError = new List<string>();
@@ -217,7 +224,7 @@ namespace SIT323
             const String RE_invalidCrozzleScore = "^INVALID_CROZZLE_SCORE=\".+\"$";
 
             // UPPERCASE=true/false.
-            const String RE_upperCase = "^UPPERCASE=(TRUE|FALSE)$";
+            const String RE_upperCase = "^[Uu][Pp][Pp][Ee][Rr][Cc][Aa][Ss][Ee]=(true|false)$";
 
             // STYLE="<style> table, td { border: 1px solid black; border-collapse: collapse; } td { width:24px; height:18px; text-align: center; } </style>"
             const String RE_style = "^STYLE=\"<STYLE>.*</STYLE>\"$";
@@ -288,10 +295,57 @@ namespace SIT323
             // To show the invalid line.
             int timeInRow = 0;
 
+            int rightUppercaseRow = -1;
+
             try
             {
 
                 String[] lines = File.ReadAllLines(path);
+
+                foreach(String line in lines)
+                {
+                    timeInRow++;
+                    // Trim and NOT Upper.
+                    String ruledLine = line.Trim();
+
+                    // If is a comment line then ignore.
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentLine))
+                    {
+                        continue;
+                    }
+
+                    // If is a space line then ignore.
+                    if (String.IsNullOrEmpty(ruledLine.Trim()))
+                    {
+                        continue;
+                    }
+
+                    // If has comment in the end of the line, remove it.
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentBehind))
+                    {
+                        ruledLine = ruledLine.Remove(ruledLine.IndexOf("//")).Trim();
+                    }
+
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_upperCase))
+                    {
+                        // If dumplicate.
+                        if (configDic["UPPERCASE"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("UPPERCASE is dumplicated");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["UPPERCASE"] = rightArr;
+                        rightUppercaseRow = timeInRow;
+                    }
+
+                }
+                
+
+                timeInRow = 0;
+
                 foreach (String line in lines)
                 {
                     // To see current row is valid or not.
@@ -327,6 +381,7 @@ namespace SIT323
                         if (configDic["LOGFILE_NAME"]!=null)
                         {
                             configTxtError.Add(timeInRow+" row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("LOGFILE_NAME is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -341,6 +396,7 @@ namespace SIT323
                         if (configDic["MINIMUM_NUMBER_OF_UNIQUE_WORDS"] != null)
                         {
                             configTxtError.Add(timeInRow+ " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MINIMUM_NUMBER_OF_UNIQUE_WORDS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -355,6 +411,7 @@ namespace SIT323
                         if (configDic["MAXIMUM_NUMBER_OF_UNIQUE_WORDS"] != null)
                         {
                             configTxtError.Add(timeInRow+ " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MAXIMUM_NUMBER_OF_UNIQUE_WORDS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -369,6 +426,7 @@ namespace SIT323
                         if (configDic["INVALID_CROZZLE_SCORE"] != null)
                         {
                             configTxtError.Add(timeInRow+ " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("INVALID_CROZZLE_SCORE is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -377,18 +435,12 @@ namespace SIT323
                         matchedCount++;
                     }
                
-                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_upperCase))
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, @"^UPPERCASE=(TRUE|FALSE)$"))
                     {
-                        // If dumplicate.
-                        if (configDic["UPPERCASE"] != null)
+                        if (rightUppercaseRow == timeInRow)
                         {
-                            configTxtError.Add(timeInRow+ " row is invalid(Dumplicated)\r\n");
-                            isValid = false;
-                            continue;
+                            matchedCount++; 
                         }
-                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                        configDic["UPPERCASE"] = rightArr;
-                        matchedCount++;
                     }
                
                     if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_style))
@@ -397,6 +449,7 @@ namespace SIT323
                         if (configDic["STYLE"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("STYLE is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -411,6 +464,7 @@ namespace SIT323
                         if (configDic["BGCOLOUR_EMPTY_TD"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("BGCOLOUR_EMPTY_TD is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -425,6 +479,7 @@ namespace SIT323
                         if (configDic["BGCOLOUR_NON_EMPTY_TD"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("BGCOLOUR_NON_EMPTY_TD is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -439,6 +494,7 @@ namespace SIT323
                         if (configDic["MINIMUM_NUMBER_OF_ROWS"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MINIMUM_NUMBER_OF_ROWS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -452,7 +508,8 @@ namespace SIT323
                         // If dumplicate.
                         if (configDic["MAXIMUM_NUMBER_OF_ROWS"] != null)
                         {
-                            Console.WriteLine(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MAXIMUM_NUMBER_OF_ROWS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -467,6 +524,7 @@ namespace SIT323
                         if (configDic["MINIMUM_NUMBER_OF_COLUMNS"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MINIMUM_NUMBER_OF_COLUMNS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -481,6 +539,7 @@ namespace SIT323
                         if (configDic["MAXIMUM_NUMBER_OF_COLUMNS"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MAXIMUM_NUMBER_OF_COLUMNS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -495,6 +554,7 @@ namespace SIT323
                         if (configDic["MINIMUM_HORIZONTAL_WORDS"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MINIMUM_HORIZONTAL_WORDS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -509,6 +569,7 @@ namespace SIT323
                         if (configDic["MAXIMUM_HORIZONTAL_WORDS"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MAXIMUM_HORIZONTAL_WORDS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -523,6 +584,7 @@ namespace SIT323
                         if (configDic["MINIMUM_VERTICAL_WORDS"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MINIMUM_VERTICAL_WORDS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -537,6 +599,7 @@ namespace SIT323
                         if (configDic["MAXIMUM_VERTICAL_WORDS"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MAXIMUM_VERTICAL_WORDS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -551,6 +614,7 @@ namespace SIT323
                         if (configDic["MINIMUM_NUMBER_OF_THE_SAME_WORD"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MINIMUM_NUMBER_OF_THE_SAME_WORD is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -565,6 +629,7 @@ namespace SIT323
                         if (configDic["MAXIMUM_NUMBER_OF_THE_SAME_WORD"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MAXIMUM_NUMBER_OF_THE_SAME_WORD is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -579,6 +644,7 @@ namespace SIT323
                         if (configDic["MINIMUM_NUMBER_OF_GROUPS"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MINIMUM_NUMBER_OF_GROUPS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -593,6 +659,7 @@ namespace SIT323
                         if (configDic["MAXIMUM_NUMBER_OF_GROUPS"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MAXIMUM_NUMBER_OF_GROUPS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -607,6 +674,7 @@ namespace SIT323
                         if (configDic["POINTS_PER_WORD"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("POINTS_PER_WORD is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -621,6 +689,7 @@ namespace SIT323
                         if (configDic["INTERSECTING_POINTS_PER_LETTER"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("INTERSECTING_POINTS_PER_LETTER is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -634,6 +703,7 @@ namespace SIT323
                         if (configDic["NON_INTERSECTING_POINTS_PER_LETTER"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("NON_INTERSECTING_POINTS_PER_LETTER is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -647,6 +717,7 @@ namespace SIT323
                         if (configDic["MINIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MINIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -660,6 +731,7 @@ namespace SIT323
                         if (configDic["MAXIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MAXIMUM_INTERSECTIONS_IN_HORIZONTAL_WORDS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -673,6 +745,7 @@ namespace SIT323
                         if (configDic["MINIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MINIMUM_INTERSECTIONS_IN_VERTICAL_WORDS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -686,6 +759,7 @@ namespace SIT323
                         if (configDic["MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS"] != null)
                         {
                             configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS is dumplicated");
                             isValid = false;
                             continue;
                         }
@@ -827,10 +901,10 @@ namespace SIT323
                 ////////////////////////
             }
 
-            return isValid;
+            validInfo[1]=isValid;
         }
 
-        public bool[] ValidateCrozzleText(String path)
+        public void ValidateCrozzleText(String path)
         {
             /**
              * This method is to 
@@ -838,7 +912,7 @@ namespace SIT323
              * 2.Build crozzle array.
              * 3.Calculate the score.
              * Parameter is file path.
-             * Return boolean array to show if the Crozzle.txt and the crozzle is valid.
+             * In the end set if the Crozzle.txt and the crozzle is valid.
              */
 
             List<String> crozzleTxtError = new List<string>();
@@ -851,8 +925,8 @@ namespace SIT323
 
             // Total types of data.
             const int Total = 6;
-            int rows = 0;
-            int cols = 0;
+            int rows = 10;  // Default row length.
+            int cols = 10;  // Default column length.
             String configPath = null;
             String wordlistPath = null;
             List<String> wordList = new List<string>();
@@ -937,7 +1011,8 @@ namespace SIT323
                     // If dumplicate.
                     if (dataChecker[0, 1] > 0)
                     {
-                        crozzleTxtError.Add(timeInRow+ " row is invalid\r\n");
+                        crozzleTxtError.Add(timeInRow+ " row is invalid(dumplicated)\r\n");
+                        crozzleTxtError.Add("Configuration.txt is dumplicated");
                         txtIsValid = false;
                         dataChecker[0, 1]++;
                         continue;
@@ -957,7 +1032,8 @@ namespace SIT323
                     // If dumplicate.
                     if (dataChecker[1, 1] > 0)
                     {
-                        crozzleTxtError.Add(timeInRow + " row is invalid\r\n");
+                        crozzleTxtError.Add(timeInRow + " row is invalid(dumplicated)\r\n");
+                        crozzleTxtError.Add("Wordlist.txt is dumplicated");
                         txtIsValid = false;
                         dataChecker[1, 1]++;
                         continue;
@@ -1018,7 +1094,8 @@ namespace SIT323
                     // If dumplicate.
                     if (dataChecker[2, 1] > 0)
                     {
-                        crozzleTxtError.Add(timeInRow + " row is invalid\r\n");
+                        crozzleTxtError.Add(timeInRow + " row is invalid(dumplicated)\r\n");
+                        crozzleTxtError.Add("ROWS is dumplicated");
                         txtIsValid = false;
                         dataChecker[2, 1]++;
                         continue;
@@ -1049,7 +1126,8 @@ namespace SIT323
                     // If dumplicate.
                     if (dataChecker[3, 1] > 0)
                     {
-                        crozzleTxtError.Add(timeInRow+ " row is invalid\r\n");
+                        crozzleTxtError.Add(timeInRow+ " row is invalid(dumplicated)\r\n");
+                        crozzleTxtError.Add("COLUMNS is dumplicated");
                         txtIsValid = false;
                         dataChecker[3, 1]++;
                         continue;
@@ -1136,18 +1214,17 @@ namespace SIT323
                 if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_horizentalWords))
                 {
                     matchedCount++;
-                    
+                    bool shouldBeAdded = true;
 
                     String[] str=ruledLine.Split(new char[]{ '=',','});
 
-                    wordList.Add(str[2]);
-
-                    List<Point> word = new List<Point>();
-                    for(int i=0; i<str[2].Length;i++){
-                        Point p = new Point(Int32.Parse(str[1]), Int32.Parse(str[3])+i, str[2][i]);
-                        word.Add(p);
+                    if (Int32.Parse(str[1]) > rows)
+                    {
+                        crozzleError.Add(timeInRow + "row is invalid\r\n");
+                        crozzleError.Add("Row of horizental word is larger than given ROWS.\r\n");
+                        crozzleIsValid = false;
+                        shouldBeAdded = false;
                     }
-                    horizentalWords.Add(word);
 
                     int rightPos=str[2].Length + Int32.Parse(str[3]) - 1;
                     if (rightPos > cols)
@@ -1155,27 +1232,39 @@ namespace SIT323
                         crozzleError.Add(timeInRow+"row is invalid\r\n");
                         crozzleError.Add("Horizental word overstep the boundary.\r\n");
                         crozzleIsValid = false;
-                        dataChecker[4, 1]++;
-                        continue;
+                        shouldBeAdded = false;
                     }
+                    if (shouldBeAdded)
+                    {
+                        List<Point> word = new List<Point>();
+                        for (int i = 0; i < str[2].Length; i++)
+                        {
+                            Point p = new Point(Int32.Parse(str[1]), Int32.Parse(str[3]) + i, str[2][i]);
+                            word.Add(p);
+                        }
+                        horizentalWords.Add(word);
+                        wordList.Add(str[2]);
+                    }
+                    
                     dataChecker[4, 1]++;
                     continue;
                 }
                 if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_verticalWords))
                 {
                     matchedCount++;
+                    bool shouldBeAdded = true;
 
                     String[] str = ruledLine.Split(new char[] { '=', ',' });
 
-                    wordList.Add(str[2]);
-
-                    List<Point> word = new List<Point>();
-                    for (int i = 0; i < str[2].Length; i++)
+                    if (Int32.Parse(str[1]) > cols)
                     {
-                        Point p = new Point(Int32.Parse(str[3])+i, Int32.Parse(str[1]), str[2][i]);
-                        word.Add(p);
+                        crozzleError.Add(timeInRow + "row is invalid\r\n");
+                        crozzleError.Add("COLUMN of horizental word is larger than given COLUMNS.\r\n");
+                        crozzleIsValid = false;
+                        shouldBeAdded = false;
                     }
-                    verticalWords.Add(word);
+
+                    
 
                     int bottomPos = str[2].Length + Int32.Parse(str[3]) - 1;
                     if (bottomPos > rows)
@@ -1183,10 +1272,21 @@ namespace SIT323
                         crozzleError.Add(timeInRow+" row is invalid\r\n");
                         crozzleError.Add("Vertical word overstep the boundary.\r\n");
                         crozzleIsValid = false;
-                        dataChecker[5, 1]++;
-                        continue;
+                        shouldBeAdded = false;
                     }
 
+                    if (shouldBeAdded)
+                    {
+                        wordList.Add(str[2]);
+
+                        List<Point> word = new List<Point>();
+                        for (int i = 0; i < str[2].Length; i++)
+                        {
+                            Point p = new Point(Int32.Parse(str[3]) + i, Int32.Parse(str[1]), str[2][i]);
+                            word.Add(p);
+                        }
+                        verticalWords.Add(word);
+                    }
                     dataChecker[5, 1]++;
                     continue;
                 }
@@ -1386,6 +1486,15 @@ namespace SIT323
             List<Point> crozzlePoints = new List<Point>();
             crozzlePoints.AddRange(iGroup);
             crozzlePoints.AddRange(niGroup);
+
+            bool isUpperCase = true;
+
+            if (configDic["UPPERCASE"] != null)
+            {
+                isUpperCase = Boolean.Parse(configDic["UPPERCASE"].ToLower());
+            }           
+
+            setPointsCase(crozzlePoints, isUpperCase);
             crozzleGrid = new char[rows, cols];
             for (int i = 0; i < rows; i++)
             {
@@ -1432,7 +1541,8 @@ namespace SIT323
                 ////////////////////////////////
             }
 
-            return new bool[] { txtIsValid, crozzleIsValid };
+            validInfo[2] = txtIsValid;
+            validInfo[3] = crozzleIsValid;
         }
 
         private static int[] SameElement(List<String> wordList)
@@ -1672,6 +1782,18 @@ namespace SIT323
             }
             niGroup = temp;
             return new List<Point>[] { niGroup, iGroup };
+        }
+
+        private static void setPointsCase(List<Point> points, bool isUppercase)
+        {
+            if (!isUppercase)
+            {
+                foreach (Point p in points)
+                {
+                    p.Letter = Char.Parse(p.Letter.ToString().ToLower());
+                }
+            }
+            
         }
 
         private class Point

@@ -28,20 +28,16 @@ namespace SIT323
                 validater.ValidateCrozzleText(fileDialog.FileName);
 
                 char[,] crozzleGrid = validater.CrozzleGrid;
+
+                String style=validater.ConfigDic["STYLE"] != null ? validater.ConfigDic["STYLE"].Split('\"')[1] : @"<style> table, td { border: 1px solid black; border-collapse: collapse; } td { width:24px; height:18px; text-align: center; } </style>";
+
                 String crozzleHTML = @"<!DOCTYPE html>
                                 <html>
-                                <head>
-                                <style>
-                                table, td {
-                                    border: 1px solid black;
-                                    border-collapse: collapse;
-                                }
-                                td {
-                                    width:24px;
-                                    text-align: center;
-                                }
-                                </style>
-                                </head>
+                                <head>"+
+                                style
+                                +
+                                
+                              @"</head>
                                 <body>
                                 <table>";
 
@@ -50,7 +46,20 @@ namespace SIT323
                     String tr = "<tr>";
 
                     for (int column = 0; column < crozzleGrid.GetLength(1); column++)
-                        tr += @"<td>" + crozzleGrid[row, column] + @"</td>";
+                    {
+                        String tdEmpty = validater.ConfigDic["BGCOLOUR_EMPTY_TD"] != null ? @"<td style='background-color:" + validater.ConfigDic["BGCOLOUR_EMPTY_TD"] + "'>" + crozzleGrid[row, column] + @"</td>" : @"<td>" + crozzleGrid[row, column] + @"</td>";
+                        String tdNonEmpty = validater.ConfigDic["BGCOLOUR_NON_EMPTY_TD"] != null ? @"<td style='background-color:" + validater.ConfigDic["BGCOLOUR_NON_EMPTY_TD"] + "'>" + crozzleGrid[row, column] + @"</td>" : @"<td>" + crozzleGrid[row, column] + @"</td>";
+                        // Empty.
+                        if (crozzleGrid[row, column]=='\0')
+                        {
+                            tr += tdEmpty;
+                        }
+                        else
+                        {
+                            tr += tdNonEmpty;
+                        }                        
+                    }
+                        
                     tr += "</tr>";
 
                     crozzleHTML += tr;
@@ -79,7 +88,26 @@ namespace SIT323
 
                 errorWebBrowser.DocumentText = errorHTML;
 
+                bool allValid = true;
+                foreach(bool b in validater.ValidInfo)
+                {
+                    if (!b)
+                    {
+                        allValid = false;
+                    }
+                }
                 scoreTextBox.Text = validater.Score.ToString();
+
+                if (!allValid)
+                {
+                    if(validater.ConfigDic["INVALID_CROZZLE_SCORE"] != null)
+                    {
+                        scoreTextBox.Text += "   " + validater.ConfigDic["INVALID_CROZZLE_SCORE"];
+                    }
+
+                    
+                }
+                                   
             }
         }
 

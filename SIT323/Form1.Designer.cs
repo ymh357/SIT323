@@ -68,7 +68,7 @@
             // validateFileToolStripMenuItem
             // 
             this.validateFileToolStripMenuItem.Name = "validateFileToolStripMenuItem";
-            this.validateFileToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.validateFileToolStripMenuItem.Size = new System.Drawing.Size(172, 26);
             this.validateFileToolStripMenuItem.Text = "Validate File";
             this.validateFileToolStripMenuItem.Click += new System.EventHandler(this.validateFileToolStripMenuItem_Click);
             // 
@@ -131,10 +131,10 @@
             // scoreTextBox
             // 
             this.scoreTextBox.BackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.scoreTextBox.Location = new System.Drawing.Point(185, 36);
+            this.scoreTextBox.Location = new System.Drawing.Point(158, 36);
             this.scoreTextBox.Name = "scoreTextBox";
             this.scoreTextBox.ReadOnly = true;
-            this.scoreTextBox.Size = new System.Drawing.Size(140, 25);
+            this.scoreTextBox.Size = new System.Drawing.Size(366, 25);
             this.scoreTextBox.TabIndex = 2;
             this.scoreTextBox.TextChanged += new System.EventHandler(this.scoreTextBox_TextChanged);
             // 
