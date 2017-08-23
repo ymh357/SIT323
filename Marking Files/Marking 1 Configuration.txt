@@ -12,8 +12,8 @@ INVALID_CROZZLE_SCORE="INVALID CROZZLE"
 UPPERCASE=true
 STYLE="<style> table, td { border: 1px solid black; border-collapse: collapse; } td { width:24px; height:18px; text-align: center; } </style>"
 
-BGCOLOUR_EMPTY_TD=#010101
-BGCOLOUR_NON_EMPTY_TD=#989898
+BGCOLOUR_EMPTY_TD=#777777
+BGCOLOUR_NON_EMPTY_TD=#ffffff
 
 // Crozzle Configurations.
 // Limits on the size of the crozzle grid.
@@ -38,8 +38,8 @@ MINIMUM_INTERSECTIONS_IN_VERTICAL_WORDS=1
 MAXIMUM_INTERSECTIONS_IN_VERTICAL_WORDS=100
 
 // Limits on duplicate words in the crozzle.
-MINIMUM_NUMBER_OF_THE_SAME_WORD=2
-MAXIMUM_NUMBER_OF_THE_SAME_WORD=1
+MINIMUM_NUMBER_OF_THE_SAME_WORD=1
+MAXIMUM_NUMBER_OF_THE_SAME_WORD=2
 
 // Limits on the number of valid word groups.
 MINIMUM_NUMBER_OF_GROUPS=1

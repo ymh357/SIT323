@@ -10,7 +10,7 @@ MAXIMUM_NUMBER_OF_UNIQUE_WORDS=1000
 // Crozzle Output Configurations.
 INVALID_CROZZLE_SCORE="INVALID CROZZLE"
 UPPERCASE=true
-STYLE="<style> table, td { border: 1px solid black; border-collapse: collapse; background-color: red} td { width:24px; height:18px; text-align: center; } </style>"
+STYLE="<style> table, td { border: 1px solid black; border-collapse: collapse; } td { width:24px; height:18px; text-align: center; } </style>"
 
 BGCOLOUR_EMPTY_TD=#777777
 BGCOLOUR_NON_EMPTY_TD=#ffffff

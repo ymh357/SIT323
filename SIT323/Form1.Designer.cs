@@ -53,7 +53,7 @@
             this.aboutToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(559, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(818, 28);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -85,7 +85,7 @@
             this.tabControl.Location = new System.Drawing.Point(3, 71);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(555, 315);
+            this.tabControl.Size = new System.Drawing.Size(815, 456);
             this.tabControl.TabIndex = 1;
             // 
             // CrozzlePage
@@ -94,7 +94,7 @@
             this.CrozzlePage.Location = new System.Drawing.Point(4, 25);
             this.CrozzlePage.Name = "CrozzlePage";
             this.CrozzlePage.Padding = new System.Windows.Forms.Padding(3);
-            this.CrozzlePage.Size = new System.Drawing.Size(547, 286);
+            this.CrozzlePage.Size = new System.Drawing.Size(807, 427);
             this.CrozzlePage.TabIndex = 0;
             this.CrozzlePage.Text = "Crozzle";
             this.CrozzlePage.UseVisualStyleBackColor = true;
@@ -105,7 +105,7 @@
             this.crozzleWebBrowser.Location = new System.Drawing.Point(3, 3);
             this.crozzleWebBrowser.MinimumSize = new System.Drawing.Size(20, 20);
             this.crozzleWebBrowser.Name = "crozzleWebBrowser";
-            this.crozzleWebBrowser.Size = new System.Drawing.Size(541, 280);
+            this.crozzleWebBrowser.Size = new System.Drawing.Size(801, 421);
             this.crozzleWebBrowser.TabIndex = 0;
             // 
             // ErrorPage
@@ -154,7 +154,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(559, 377);
+            this.ClientSize = new System.Drawing.Size(818, 523);
             this.Controls.Add(this.scoreLabel);
             this.Controls.Add(this.scoreTextBox);
             this.Controls.Add(this.tabControl);
