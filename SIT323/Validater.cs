@@ -93,7 +93,7 @@ namespace SIT323
              */
 
             List<String> wordlistError = new List<string>();
-            wordlistError.Add("-------------------------Wordlist error.\r\n");
+            wordlistError.Add("----------Wordlist error----------\r\n");
 
             bool isValid = true;
             const String RE_validMatch = "^[a-zA-Z]+$";
@@ -201,7 +201,7 @@ namespace SIT323
              */
 
             List<String> configTxtError = new List<string>();
-            configTxtError.Add("-------------------------Configuration error.\r\n");
+            configTxtError.Add("----------Configuration error----------\r\n");
 
             bool isValid = true;
 
@@ -916,15 +916,13 @@ namespace SIT323
              */
 
             List<String> crozzleTxtError = new List<string>();
-            crozzleTxtError.Add("-------------------------Crozzle.txt error.\r\n");
+            crozzleTxtError.Add("----------Crozzle.txt error----------\r\n");
             List<String> crozzleError = new List<string>();
-            crozzleError.Add("-------------------------Crozzle error.\r\n");
+            crozzleError.Add("----------Crozzle error----------\r\n");
 
             bool txtIsValid = true;
             bool crozzleIsValid = true;
 
-            // Total types of data.
-            const int Total = 6;
             int rows = 10;  // Default row length.
             int cols = 10;  // Default column length.
             String configPath = null;
@@ -934,7 +932,7 @@ namespace SIT323
             List<List<Point>> verticalWords = new List<List<Point>>();
 
             // Connect number of data with its content.
-            String[] dataContent = new String[Total];
+            Dictionary<String, int> data_AppearTime = new Dictionary<string, int>();
 
             // Whole line is a comment.
             const String RE_commentLine = @"^//.*$";
@@ -944,37 +942,31 @@ namespace SIT323
 
             // CONFIGURATION_FILE.
             const String RE_configFile = "^CONFIGURATION_FILE=\".+\"$";
-            dataContent[0] = "CONFIGURATION_FILE";
+            data_AppearTime.Add("CONFIGURATION_FILE",0);
 
             // WORDLIST_FILE.
             const String RE_wordlistFile = "^WORDLIST_FILE=\".+\"$";
-            dataContent[1] = "WORDLIST_FILE";
+            data_AppearTime.Add("WORDLIST_FILE",0);
 
             // The number of rows and columns.
             const String RE_rows = "^ROWS=\\d+$";
             const String RE_cols = "^COLUMNS=\\d+$";
-            dataContent[2] = "ROWS";
-            dataContent[3] = "COLUMNS";
+            data_AppearTime.Add("ROWS",0);
+            data_AppearTime.Add("COLUMNS",0);
 
             // The horizontal rows containing words.
             const String RE_horizentalWords = "^ROW=\\d+,[A-Z]+,\\d+$";
-            dataContent[4] = "HorizentalWords";
+            data_AppearTime.Add("HorizentalWords",0);
 
             // The vertical rows containing words.
             const String RE_verticalWords = "^COLUMN=\\d+,[A-Z]+,\\d+$";
-            dataContent[5] = "VerticalWords";
+            data_AppearTime.Add("VerticalWords",0);
 
             // To show the invalid line.
             int timeInRow = 0;
 
             // Row of dataChecker is dataLine; Column of dataChecker is the time data appear;
             // To ensure no dumplicated data and every data exists.
-            int[,] dataChecker = new int[Total, 2];
-            for (int i = 0; i < Total; i++)
-            {
-                dataChecker[i, 0] = i;
-                dataChecker[i, 1] = 0;
-            }
 
             String[] temp = File.ReadAllLines(path);
             List<String> lines = new List<string>(temp);
@@ -1009,15 +1001,15 @@ namespace SIT323
                 {
 
                     // If dumplicate.
-                    if (dataChecker[0, 1] > 0)
+                    if (data_AppearTime["CONFIGURATION_FILE"] > 0)
                     {
                         crozzleTxtError.Add(timeInRow+ " row is invalid(dumplicated)\r\n");
                         crozzleTxtError.Add("Configuration.txt is dumplicated");
                         txtIsValid = false;
-                        dataChecker[0, 1]++;
+                        data_AppearTime["CONFIGURATION_FILE"]++;
                         continue;
                     }
-                    dataChecker[0, 1]++;
+                    data_AppearTime["CONFIGURATION_FILE"]++;
                     String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     String directory=Path.GetDirectoryName(path);
                     configPath = directory+rightArr.TrimStart('\"').TrimEnd('\"');
@@ -1030,15 +1022,15 @@ namespace SIT323
                     
 
                     // If dumplicate.
-                    if (dataChecker[1, 1] > 0)
+                    if (data_AppearTime["WORDLIST_FILE"] > 0)
                     {
                         crozzleTxtError.Add(timeInRow + " row is invalid(dumplicated)\r\n");
                         crozzleTxtError.Add("Wordlist.txt is dumplicated");
                         txtIsValid = false;
-                        dataChecker[1, 1]++;
+                        data_AppearTime["WORDLIST_FILE"]++;
                         continue;
                     }
-                    dataChecker[1, 1]++;
+                    data_AppearTime["WORDLIST_FILE"]++;
                     String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     String directory = Path.GetDirectoryName(path);
                     wordlistPath = directory+rightArr.TrimStart('\"').TrimEnd('\"');
@@ -1092,15 +1084,15 @@ namespace SIT323
                     
 
                     // If dumplicate.
-                    if (dataChecker[2, 1] > 0)
+                    if (data_AppearTime["ROWS"] > 0)
                     {
                         crozzleTxtError.Add(timeInRow + " row is invalid(dumplicated)\r\n");
                         crozzleTxtError.Add("ROWS is dumplicated");
                         txtIsValid = false;
-                        dataChecker[2, 1]++;
+                        data_AppearTime["ROWS"]++;
                         continue;
                     }
-                    dataChecker[2, 1]++;
+                    data_AppearTime["ROWS"]++;
                     String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     rows = Int32.Parse(rightArr);
                     try
@@ -1124,15 +1116,15 @@ namespace SIT323
                     
 
                     // If dumplicate.
-                    if (dataChecker[3, 1] > 0)
+                    if (data_AppearTime["COLUMNS"] > 0)
                     {
                         crozzleTxtError.Add(timeInRow+ " row is invalid(dumplicated)\r\n");
                         crozzleTxtError.Add("COLUMNS is dumplicated");
                         txtIsValid = false;
-                        dataChecker[3, 1]++;
+                        data_AppearTime["COLUMNS"]++;
                         continue;
                     }
-                    dataChecker[3, 1]++;
+                    data_AppearTime["COLUMNS"]++;
                     String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
                     cols = Int32.Parse(rightArr);
                     try
@@ -1245,8 +1237,8 @@ namespace SIT323
                         horizentalWords.Add(word);
                         wordList.Add(str[2]);
                     }
-                    
-                    dataChecker[4, 1]++;
+
+                    data_AppearTime["HorizentalWords"]++;
                     continue;
                 }
                 if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_verticalWords))
@@ -1287,7 +1279,7 @@ namespace SIT323
                         }
                         verticalWords.Add(word);
                     }
-                    dataChecker[5, 1]++;
+                    data_AppearTime["VerticalWords"]++;
                     continue;
                 }
 
@@ -1301,11 +1293,11 @@ namespace SIT323
             }
 
             // Check if every data appears.
-            for (int i = 2; i < Total; i++)   
+            foreach(String key in data_AppearTime.Keys) 
             {
-                if (dataChecker[i, 1] == 0)
+                if (data_AppearTime[key]== 0)
                 {
-                    crozzleTxtError.Add("data "+ dataContent[i] + " is lack or invalid\r\n" );
+                    crozzleTxtError.Add("data "+ key + " is lack or invalid\r\n" );
                     txtIsValid = false;
                 }
             }
@@ -1313,7 +1305,7 @@ namespace SIT323
             // Check horrizental words.
             try
             {
-                if (dataChecker[4, 1] < Int32.Parse(configDic["MINIMUM_HORIZONTAL_WORDS"]) || dataChecker[4, 1] > Int32.Parse(configDic["MAXIMUM_HORIZONTAL_WORDS"]))
+                if (data_AppearTime["HorizentalWords"] < Int32.Parse(configDic["MINIMUM_HORIZONTAL_WORDS"]) || data_AppearTime["HorizentalWords"] > Int32.Parse(configDic["MAXIMUM_HORIZONTAL_WORDS"]))
                 {
                     crozzleError.Add("Horizental words number does not meet the demand of configuration.txt\r\n");
                     crozzleIsValid = false;
@@ -1326,7 +1318,7 @@ namespace SIT323
             // Check vertical words.
             try
             {
-                if (dataChecker[4, 1] < Int32.Parse(configDic["MINIMUM_VERTICAL_WORDS"]) || dataChecker[4, 1] > Int32.Parse(configDic["MAXIMUM_VERTICAL_WORDS"]))
+                if (data_AppearTime["VerticalWords"] < Int32.Parse(configDic["MINIMUM_VERTICAL_WORDS"]) || data_AppearTime["VerticalWords"] > Int32.Parse(configDic["MAXIMUM_VERTICAL_WORDS"]))
                 {
                     crozzleError.Add("Vertical words number does not meet the demand of configuration.txt\r\n");
                     crozzleIsValid = false;
