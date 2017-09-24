@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace SIT323
 {
@@ -14,12 +15,28 @@ namespace SIT323
         [STAThread]
         static void Main()
         {
-            // Validater v = new Validater();
-            // v.ValidateCrozzleText("Test 7 Crozzle.txt");
-            // Console.WriteLine(v.ValidateCrozzleText("TESTCROZZLE.TXT")[1]);
-            Application.EnableVisualStyles();
+
+
+            Validater v = new Validater();
+            String IISFilename = @"http://www.it.deakin.edu.au/SIT323/Task2/Test1.czl";
+            String azureFilename=@"http://sit323.azurewebsites.net/Task2/Test1.czl";
+            try
+            {
+                 v.GetMaxCrozzle(IISFilename);
+            }
+            catch
+            {
+                v.GetMaxCrozzle(azureFilename);
+            }
+
+            /*Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new Form1());*/
+
+            /*SubSolutions subSolutions = new SubSolutions(v.WordList, 2);
+            subSolutions.testSolutions();*/
+
+            
         }
     }
 }

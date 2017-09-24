@@ -8,15 +8,9 @@ No error.
 
 ----------Crozzle.txt error----------
 
-No error.
-
 ----------Crozzle error----------
 
-Horizental words number does not meet the demand of configuration.txt
+No error.
 
-Same word number does not meet the demand of configuration.
-
-INTERSECTIONS_IN_HORIZONTAL_WORDS does not meet the demand of configuration
-
-Word groups number does not meet the demand of configuration
+No error.
 

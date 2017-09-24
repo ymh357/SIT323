@@ -13,13 +13,31 @@ namespace SIT323
 {
     public partial class Form1 : Form
     {
+        private System.Timers.Timer aTimer;
         public Form1()
         {
+            /*
+            // New change.
+            aTimer = new System.Timers.Timer(10000);
+            aTimer.Elapsed += aTimer_Elapsed;
+            // New change.
+            aTimer.Start();
+            while (aTimer.Enabled)
+            {
+            }*/
             InitializeComponent();
         }
 
+        // New change.
+        private void aTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            aTimer.Stop();           // stop the timer when the event occurs
+        }
+
         private void validateFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            
+
             OpenFileDialog fileDialog = new OpenFileDialog();
 
             if (fileDialog.ShowDialog() == DialogResult.OK)

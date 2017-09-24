@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+// New change.
+using System.Net;
 
 namespace SIT323
 {
@@ -16,11 +18,17 @@ namespace SIT323
         // A boolean array to save information about whether these 4 things are valid or not.
         private bool[] validInfo= null;
 
+        // New change.
+        private List<String> wordList = null;
+
         public char[,] CrozzleGrid { get => crozzleGrid;}
         public string LogPath { get => logPath;}
         public int Score { get => score; }
         public bool[] ValidInfo { get => validInfo;}
         public Dictionary<string, string> ConfigDic { get => configDic;}
+
+        // New change.
+        public List<string> WordList { get => wordList;}
 
         public Validater()
         {
@@ -29,6 +37,10 @@ namespace SIT323
             configDic = new Dictionary<string, string>();
 
             configDic.Add("LOGFILE_NAME",null);
+
+            // New change.
+            configDic.Add("RUNTIME_LIMIT", null);
+            configDic.Add("WORD_REGEX_PATTERN", null);
 
             configDic.Add("MINIMUM_NUMBER_OF_UNIQUE_WORDS",null);
 
@@ -107,9 +119,21 @@ namespace SIT323
 
             try
             {
-                String[] lines = File.ReadAllLines(path);
-                foreach (String line in lines)
+                // New change.
+
+                // Create a WebClient.
+                WebClient webClient = new WebClient();
+
+                // Open a stream.
+                Stream aStream = webClient.OpenRead(path);
+
+                // Open a StreamReader (which makes reading lines simpler).
+                StreamReader aStreamReader = new StreamReader(aStream);
+
+                // Process each line.
+                while (!aStreamReader.EndOfStream)
                 {
+                    string line = aStreamReader.ReadLine();
                     timeInRow++;
 
                     String[] words = line.Split(new char[] { ',' });
@@ -150,6 +174,8 @@ namespace SIT323
                         }
                     }
                 }
+                aStreamReader.Close();
+                aStream.Close();
             }catch(Exception)
             {
                 wordlistError.Add("Please check Wordlist file path.");
@@ -177,6 +203,9 @@ namespace SIT323
             if (isValid)
             {
                 wordlistError.Add("No error.\r\n");
+
+                // New change.
+                this.wordList = wordList;
             }
             try
             {
@@ -213,6 +242,14 @@ namespace SIT323
 
             // LOGFILE_NAME="log.txt".
             const String RE_logFile = "^LOGFILE_NAME=\".+\"$";
+
+            // New change.
+            // RUNTIME_LIMIT=300.
+            const String RE_timeLimit = "^RUNTIME_LIMIT=\\d+$";
+
+            // New change.
+            // WORD_REGEX_PATTERN="[a-zA-Z]{2,}".
+            const String RE_pattern = "^WORD_REGEX_PATTERN=\".+\"$";
 
             // MINIMUM_NUMBER_OF_UNIQUE_WORDS=10.
             const String RE_minWords = "^MINIMUM_NUMBER_OF_UNIQUE_WORDS=\\d+$";
@@ -299,55 +336,80 @@ namespace SIT323
 
             try
             {
+                // New change.
+                //String[] lines = File.ReadAllLines(path);
 
-                String[] lines = File.ReadAllLines(path);
+                //foreach(String line in lines)
+                // Create a WebClient.
+                WebClient webClient = new WebClient();
 
-                foreach(String line in lines)
+                // Open a stream.
+                Stream aStream = webClient.OpenRead(path);
+
+                // Open a StreamReader (which makes reading lines simpler).
+                StreamReader aStreamReader = new StreamReader(aStream);
+
+                // Process each line.
+                while (!aStreamReader.EndOfStream)
                 {
-                    timeInRow++;
-                    // Trim and NOT Upper.
-                    String ruledLine = line.Trim();
-
-                    // If is a comment line then ignore.
-                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentLine))
+                    string line = aStreamReader.ReadLine();
                     {
-                        continue;
-                    }
+                        timeInRow++;
+                        // Trim and NOT Upper.
+                        String ruledLine = line.Trim();
 
-                    // If is a space line then ignore.
-                    if (String.IsNullOrEmpty(ruledLine.Trim()))
-                    {
-                        continue;
-                    }
-
-                    // If has comment in the end of the line, remove it.
-                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentBehind))
-                    {
-                        ruledLine = ruledLine.Remove(ruledLine.IndexOf("//")).Trim();
-                    }
-
-                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_upperCase))
-                    {
-                        // If dumplicate.
-                        if (configDic["UPPERCASE"] != null)
+                        // If is a comment line then ignore.
+                        if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentLine))
                         {
-                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
-                            configTxtError.Add("UPPERCASE is dumplicated");
-                            isValid = false;
                             continue;
                         }
-                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
-                        configDic["UPPERCASE"] = rightArr;
-                        rightUppercaseRow = timeInRow;
-                    }
 
+                        // If is a space line then ignore.
+                        if (String.IsNullOrEmpty(ruledLine.Trim()))
+                        {
+                            continue;
+                        }
+
+                        // If has comment in the end of the line, remove it.
+                        if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentBehind))
+                        {
+                            ruledLine = ruledLine.Remove(ruledLine.IndexOf("//")).Trim();
+                        }
+
+                        if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_upperCase))
+                        {
+                            // If dumplicate.
+                            if (configDic["UPPERCASE"] != null)
+                            {
+                                configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                                configTxtError.Add("UPPERCASE is dumplicated");
+                                isValid = false;
+                                continue;
+                            }
+                            String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                            configDic["UPPERCASE"] = rightArr;
+                            rightUppercaseRow = timeInRow;
+                        }
+
+                    }
                 }
-                
+                aStreamReader.Close();
+                aStream.Close();
 
                 timeInRow = 0;
 
-                foreach (String line in lines)
+                // New change.
+                //foreach (String line in lines)
+
+                // Open a StreamReader (which makes reading lines simpler).
+                aStream = webClient.OpenRead(path);
+                aStreamReader = new StreamReader(aStream);
+
+                // Process each line.
+                while (!aStreamReader.EndOfStream)
                 {
+                    String line = aStreamReader.ReadLine();
+                        
                     // To see current row is valid or not.
                     int matchedCount = 0;
 
@@ -389,7 +451,40 @@ namespace SIT323
                         configDic["LOGFILE_NAME"] = rightArr;
                         matchedCount++;
                     }
-              
+
+                    // New change.
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_timeLimit))
+                    {
+
+                        // If dumplicate.
+                        if (configDic["RUNTIME_LIMIT"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("RUNTIME_LIMIT is dumplicated");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["RUNTIME_LIMIT"] = rightArr;
+                        matchedCount++;
+                    }
+                    // New change.
+                    if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_pattern))
+                    {
+
+                        // If dumplicate.
+                        if (configDic["WORD_REGEX_PATTERN"] != null)
+                        {
+                            configTxtError.Add(timeInRow + " row is invalid(Dumplicated)\r\n");
+                            configTxtError.Add("WORD_REGEX_PATTERN is dumplicated");
+                            isValid = false;
+                            continue;
+                        }
+                        String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                        configDic["WORD_REGEX_PATTERN"] = rightArr;
+                        matchedCount++;
+                    }
+
                     if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_minWords))
                     {
                         // If dumplicate.
@@ -779,6 +874,8 @@ namespace SIT323
                     }
 
                 }
+                aStreamReader.Close();
+                aStream.Close();
             }catch(Exception)
             {
                 configTxtError.Add("Please check Configuration file path.");
@@ -891,7 +988,9 @@ namespace SIT323
             }
             try
             {
-                String directory = Path.GetDirectoryName(Path.GetDirectoryName(path));
+                // New change.
+                String directory = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Directory.GetCurrentDirectory())));
+        
                 logPath = directory + "/Log Files/" + configDic["LOGFILE_NAME"].Split('\"')[1];
                 File.Delete(logPath);
                 File.AppendAllLines(logPath, configTxtError);
@@ -1344,12 +1443,12 @@ namespace SIT323
             }
 
             // Check if there is inside confliction.
-            if (hasConflictionInside(horizentalWords))
+            if (HasConflictionInside(horizentalWords))
             {
                 crozzleError.Add("Has confliction in horizental words.\r\n");
                 crozzleIsValid = false;
             }
-            if (hasConflictionInside(verticalWords))
+            if (HasConflictionInside(verticalWords))
             {
                 crozzleError.Add("Has confliction in vertical words.\r\n");
                 crozzleIsValid = false;
@@ -1399,7 +1498,7 @@ namespace SIT323
             {
                 points.AddRange(word);
             }
-            List<List<Point>> groups = devideIntoGroups(points);
+            List<List<Point>> groups = DevideIntoGroups(points);
             try
             {
                 if (groups.Count < Int32.Parse(configDic["MINIMUM_NUMBER_OF_GROUPS"]) || groups.Count > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_GROUPS"]))
@@ -1425,7 +1524,7 @@ namespace SIT323
                 /////////////////////
             }
 
-            List<Point>[] gs = devideByCross(points);
+            List<Point>[] gs = DevideByCross(points);
             List<Point> niGroup = gs[0];
             List<Point> iGroup = gs[1];
 
@@ -1486,7 +1585,7 @@ namespace SIT323
                 isUpperCase = Boolean.Parse(configDic["UPPERCASE"].ToLower());
             }           
 
-            setPointsCase(crozzlePoints, isUpperCase);
+            SetPointsCase(crozzlePoints, isUpperCase);
             crozzleGrid = new char[rows, cols];
             for (int i = 0; i < rows; i++)
             {
@@ -1537,6 +1636,426 @@ namespace SIT323
             validInfo[3] = crozzleIsValid;
         }
 
+        // New change.
+        public void GetMaxCrozzle(String path)
+        {
+               
+
+            List<String> crozzleTxtError = new List<string>();
+            crozzleTxtError.Add("----------Crozzle.txt error----------\r\n");
+            List<String> crozzleError = new List<string>();
+            crozzleTxtError.Add("----------Crozzle error----------\r\n");
+
+            bool txtIsValid = true;
+            bool crozzleIsValid = true;
+
+                
+            String configPath = null;
+            String wordlistPath = null;
+
+            int rows = 10;
+            int cols = 10;
+                
+
+            // Connect number of data with its content.
+            Dictionary<String, int> data_AppearTime = new Dictionary<string, int>();
+
+            // Whole line is a comment.
+            const String RE_commentLine = @"^//.*$";
+
+            // Has comment in the end of the line.
+            const String RE_commentBehind = "^\\S+.*//.*$";
+
+            // CONFIGURATION_FILE.
+            const String RE_configFile = "^CONFIGURATION_FILE=\".+\"$";
+            data_AppearTime.Add("CONFIGURATION_FILE", 0);
+
+            // WORDLIST_FILE.
+            const String RE_wordlistFile = "^WORDLIST_FILE=\".+\"$";
+            data_AppearTime.Add("WORDLIST_FILE", 0);
+
+            // The number of rows and columns.
+            const String RE_rows = "^ROWS=\\d+$";
+            const String RE_cols = "^COLUMNS=\\d+$";
+            data_AppearTime.Add("ROWS", 0);
+            data_AppearTime.Add("COLUMNS", 0);
+
+            // To show the invalid line.
+            int timeInRow = 0;
+
+            // Create a WebClient.
+            WebClient webClient = new WebClient();
+
+            // Open a stream.
+            Stream aStream = webClient.OpenRead(path);
+
+            // Open a StreamReader (which makes reading lines simpler).
+            StreamReader aStreamReader = new StreamReader(aStream);
+
+            // Process each line.
+            while (!aStreamReader.EndOfStream)
+            {
+                string line = aStreamReader.ReadLine() ;
+                timeInRow++;
+
+                // Trim and Upper.
+                String ruledLine = line.Trim().ToUpper();
+
+                // If is a comment line then ignore.
+                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentLine))
+                {
+                    continue;
+                }
+
+                // If is a space line then ignore.
+                if (String.IsNullOrEmpty(ruledLine.Trim()))
+                {
+                    continue;
+                }
+
+                // If has comment in the end of the line, remove it.
+                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentBehind))
+                {
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_wordlistFile)&& !System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_configFile))
+                        ruledLine = ruledLine.Remove(ruledLine.IndexOf("//")).Trim();
+                }
+
+                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_configFile))
+                {
+
+                    // If dumplicate.
+                    if (data_AppearTime["CONFIGURATION_FILE"] > 0)
+                    {
+                        crozzleTxtError.Add(timeInRow + " row is invalid(dumplicated)\r\n");
+                        crozzleTxtError.Add("Configuration.txt is dumplicated");
+                        txtIsValid = false;
+                        data_AppearTime["CONFIGURATION_FILE"]++;
+                        continue;
+                    }
+                    data_AppearTime["CONFIGURATION_FILE"]++;
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                    // New change.
+                    //String directory = Path.GetDirectoryName(path);
+                    //configPath = directory + rightArr.TrimStart('\"').TrimEnd('\"');
+                    configPath = rightArr.TrimStart('\"').TrimEnd('\"');
+                    continue;
+                }
+
+                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_wordlistFile))
+                {
+
+
+                    // If dumplicate.
+                    if (data_AppearTime["WORDLIST_FILE"] > 0)
+                    {
+                        crozzleTxtError.Add(timeInRow + " row is invalid(dumplicated)\r\n");
+                        crozzleTxtError.Add("Wordlist.txt is dumplicated");
+                        txtIsValid = false;
+                        data_AppearTime["WORDLIST_FILE"]++;
+                        continue;
+                    }
+                    data_AppearTime["WORDLIST_FILE"]++;
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                    // New change.
+                    //String directory = Path.GetDirectoryName(path);
+                    // wordlistPath = directory + rightArr.TrimStart('\"').TrimEnd('\"');
+                    wordlistPath =rightArr.TrimStart('\"').TrimEnd('\"');
+                    continue;
+                }
+            }
+            aStreamReader.Close();
+            aStream.Close();
+
+            timeInRow = 0;
+            if (configPath == null)
+            {
+                crozzleTxtError.Add("Lack or invalid configuration path.\r\n");
+                txtIsValid = false;
+            }
+            if (wordlistPath == null)
+            {
+                crozzleTxtError.Add("Lack or invalid wordlist path.\r\n");
+                txtIsValid = false;
+            }
+
+            ValidateConfigText(configPath);
+            ValidateWordlist(wordlistPath);
+
+            // Second, find rows and columns.
+
+            // Open a StreamReader (which makes reading lines simpler).
+            aStream = webClient.OpenRead(path);
+            aStreamReader = new StreamReader(aStream);
+
+            // Process each line.
+            while (!aStreamReader.EndOfStream)
+            {
+                string line = aStreamReader.ReadLine();
+                timeInRow++;
+
+                // Trim and Upper.
+                String ruledLine = line.Trim().ToUpper();
+
+                // If is a comment line then ignore.
+                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentLine))
+                {
+                    continue;
+                }
+
+                // If is a space line then ignore.
+                if (String.IsNullOrEmpty(ruledLine.Trim()))
+                {
+                    continue;
+                }
+
+                // If has comment in the end of the line, remove it.
+                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_commentBehind))
+                {
+                    ruledLine = ruledLine.Remove(ruledLine.IndexOf("//")).Trim();
+                }
+
+                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_rows))
+                {
+
+
+                    // If dumplicate.
+                    if (data_AppearTime["ROWS"] > 0)
+                    {
+                        crozzleTxtError.Add(timeInRow + " row is invalid(dumplicated)\r\n");
+                        crozzleTxtError.Add("ROWS is dumplicated");
+                        txtIsValid = false;
+                        data_AppearTime["ROWS"]++;
+                        continue;
+                    }
+                    data_AppearTime["ROWS"]++;
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                    rows = Int32.Parse(rightArr);
+                    try
+                    {
+                        if (rows < Int32.Parse(configDic["MINIMUM_NUMBER_OF_ROWS"]) || rows > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_ROWS"]))
+                        {
+                            crozzleError.Add(timeInRow + " row is invalid\r\n");
+                            crozzleError.Add("Rows number does not meet the demand of configuration.txt\r\n");
+                            crozzleIsValid = false;
+                            continue;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        //////////////////
+                    }
+                    continue;
+                }
+                if (System.Text.RegularExpressions.Regex.IsMatch(ruledLine, RE_cols))
+                {
+
+
+                    // If dumplicate.
+                    if (data_AppearTime["COLUMNS"] > 0)
+                    {
+                        crozzleTxtError.Add(timeInRow + " row is invalid(dumplicated)\r\n");
+                        crozzleTxtError.Add("COLUMNS is dumplicated");
+                        txtIsValid = false;
+                        data_AppearTime["COLUMNS"]++;
+                        continue;
+                    }
+                    data_AppearTime["COLUMNS"]++;
+                    String rightArr = ruledLine.Remove(0, ruledLine.IndexOf('=') + 1);
+                    cols = Int32.Parse(rightArr);
+                    try
+                    {
+                        if (cols < Int32.Parse(configDic["MINIMUM_NUMBER_OF_COLUMNS"]) || cols > Int32.Parse(configDic["MAXIMUM_NUMBER_OF_COLUMNS"]))
+                        {
+                            crozzleError.Add(timeInRow + " row is invalid\r\n");
+                            crozzleError.Add("Columns number does not meet the demand of configuration.txt\r\n");
+                            crozzleIsValid = false;
+                            continue;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        ////////////////////////
+                    }
+                    continue;
+                }
+            }
+            aStreamReader.Close();
+            aStream.Close();
+            if (rows == 0)
+            {
+                crozzleTxtError.Add("Lack or invalid rows.\r\n");
+                txtIsValid = false;
+            }
+            if (cols == 0)
+            {
+                crozzleTxtError.Add("Lack or invalid columns.\r\n");
+                txtIsValid = false;
+            }
+  
+
+            // Check if every data appears.
+            foreach (String key in data_AppearTime.Keys)
+            {
+                if (data_AppearTime[key] == 0)
+                {
+                    crozzleTxtError.Add("data " + key + " is lack or invalid\r\n");
+                    txtIsValid = false;
+                }
+            }
+
+            if (txtIsValid)
+            {
+                crozzleTxtError.Add("No error.\r\n");
+            }
+            try
+            {
+                File.AppendAllLines(logPath, crozzleTxtError);
+            }
+            catch (Exception)
+            {
+                ////////////////////////
+            }
+
+            if (crozzleIsValid)
+            {
+                crozzleError.Add("No error.\r\n");
+            }
+            try
+            {
+                File.AppendAllLines(logPath, crozzleError);
+            }
+            catch (Exception)
+            {
+                ////////////////////////////////
+            }
+
+            // Intersecting letter points dictionary
+            Dictionary<char, int> ipDic = new Dictionary<char, int>();
+            try
+            {
+                String tempStr = configDic["INTERSECTING_POINTS_PER_LETTER"];
+                String[] ss = tempStr.Split(new char[] { '\"', ',' });
+                for (int i = 1; i < 27; i++)
+                {
+                    String[] tempss = ss[i].Split('=');
+                    ipDic.Add(Char.Parse(tempss[0]), Int32.Parse(tempss[1]));
+                }
+            }
+            catch (Exception)
+            {
+                /////////////////////////////////////
+            }
+
+            // Non intersecting letter points dictionary
+            Dictionary<char, int> nipDic = new Dictionary<char, int>();
+            try
+            {
+                String tempStr2 = configDic["NON_INTERSECTING_POINTS_PER_LETTER"];
+                String[] ss2 = tempStr2.Split(new char[] { '\"', ',' });
+                for (int i = 1; i < 27; i++)
+                {
+                    String[] tempss = ss2[i].Split('=');
+                    nipDic.Add(Char.Parse(tempss[0]), Int32.Parse(tempss[1]));
+                }
+            }
+            catch (Exception)
+            {
+                //////////////////
+            }
+
+            int ppw = 0;
+
+            try
+            {
+                ppw = Int32.Parse(configDic["POINTS_PER_WORD"]);
+            }
+            catch (Exception)
+            {
+                /////////////////////
+            }
+
+            /*SubSolution subSolution = new SubSolution(4, 4);
+            subSolution.ArrayGrid = new char[4, 4]{ {'A',' ','A','C' }
+                                                 ,{'A','B',' ','C' },
+                                                 {'A',' ','A',' ' },
+                                                 {'A','C','B',' ' }
+                                                  };
+            subSolution.SetPoints();
+            //subSolution.ShowGrid();
+            Grid grid = new SubSolution(5, 5);
+            grid.ArrayGrid = new char[5, 5]{ {' ',' ',' ',' ',' ' },
+                                           {' ',' ',' ',' ',' ' },
+                                           { ' ',' ',' ',' ',' ' },
+                                           {' ',' ',' ',' ',' ' },
+                                           {' ',' ',' ',' ',' ' }};
+            //grid.ShowGrid();
+            Dictionary<char, int> dic = new Dictionary<char, int>();
+            dic.Add('a', 10);*/
+            /*Grid grid = new Grid(rows, cols, ipDic, nipDic, ppw);
+
+            SubSolutions subSolutions = new SubSolutions(wordList, 2, ipDic, nipDic, ppw);
+
+            SubSolution subSolution = null;
+            while ((subSolution = subSolutions.GetBestSubSolution()) != null)
+            {
+                List<Grid> grids=grid.Insert(subSolution);
+                foreach (Grid g in grids)
+                {
+
+                }
+                subSolutions.Remove(subSolution);
+            }*/
+            //grid.SetScore();
+            //Console.WriteLine(grid.Score);
+            wordList.Clear();
+            wordList.Add("FOOD");
+            wordList.Add("ONE");
+            wordList.Add("TWO");
+            wordList.Add("THREE");
+            wordList.Add("FOUR");
+            wordList.Add("FIVE");
+
+            SubSolutions subSolutions = new SubSolutions(wordList, 2, ipDic, nipDic, ppw);
+            Grid grid = new Grid(rows, cols, ipDic, nipDic, ppw);
+            Grid maxGrid=getMaxGrid(rows, cols, ipDic, nipDic, ppw, subSolutions, grid);
+            Console.WriteLine(maxGrid.Score);
+        }
+
+        private Grid getMaxGrid(int rows, int cols, Dictionary<char,int> ipDic, Dictionary<char, int> nipDic, int ppw, SubSolutions subSolutions, Grid grid)
+        {
+
+            Grid g = grid;
+            if (subSolutions == null)
+            {
+                return g;
+            }
+
+            SubSolution bestSubSolution = subSolutions.GetBestSubSolution();
+            subSolutions.Remove(bestSubSolution);
+            if (bestSubSolution == null)
+            {
+                return g;
+            }
+            List<Grid> grids = grid.Insert(bestSubSolution);
+            if (grids == null)
+            {
+                return getMaxGrid(rows, cols, ipDic, nipDic, ppw, subSolutions, grid);
+            }
+            int max = 0;
+            for(int i = 0; i < grids.Count; i++)
+            {
+                Grid tempGrid=getMaxGrid(rows, cols, ipDic, nipDic, ppw, subSolutions, grids[i]);
+                tempGrid.SetScore();
+                if (max < tempGrid.Score)
+                {
+                    g = tempGrid;
+                    max = tempGrid.Score;
+                }
+            }
+
+            return g;
+        }
+
         private static int[] SameElement(List<String> wordList)
         {
             /**
@@ -1576,7 +2095,7 @@ namespace SIT323
             return nums;
         }
 
-        private static bool hasConflictionInside(List<List<Point>> words)
+        private static bool HasConflictionInside(List<List<Point>> words)
         {
             /**
              * To see whether or not wordsList have confliction. 
@@ -1688,7 +2207,7 @@ namespace SIT323
             }
         }
 
-        private static List<List<Point>> devideIntoGroups(List<Point> points)
+        private static List<List<Point>> DevideIntoGroups(List<Point> points)
         {
             /**
              * This method is to devide all the points into non contigous groups.
@@ -1743,7 +2262,7 @@ namespace SIT323
             return neighbours;
         }
 
-        private static List<Point>[] devideByCross(List<Point> points)
+        private static List<Point>[] DevideByCross(List<Point> points)
         {
             /**
              * This method is to devide points into two groups:
@@ -1776,7 +2295,7 @@ namespace SIT323
             return new List<Point>[] { niGroup, iGroup };
         }
 
-        private static void setPointsCase(List<Point> points, bool isUppercase)
+        private static void SetPointsCase(List<Point> points, bool isUppercase)
         {
             if (!isUppercase)
             {
@@ -1788,13 +2307,10 @@ namespace SIT323
             
         }
 
-        private class Point
+        // New change.
+       /* private class Point
         {
-            /**
-                * This inner class represents point in crozzle grid.
-                * 
-                * Contain 3 properties.
-                */
+           
             private int row;
             private int column;
             private char letter;
@@ -1809,7 +2325,10 @@ namespace SIT323
             public int Row { get => row; set => row = value; }
             public int Column { get => column; set => column = value; }
             public char Letter { get => letter; set => letter = value; }
-        }
+        }*/
+
+        /*// New change.
+        public */
     }
 }
 
