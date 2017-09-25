@@ -2007,13 +2007,12 @@ namespace SIT323
             }*/
             //grid.SetScore();
             //Console.WriteLine(grid.Score);
-            wordList.Clear();
-            wordList.Add("FOOD");
-            wordList.Add("ONE");
-            wordList.Add("TWO");
-            wordList.Add("THREE");
-            wordList.Add("FOUR");
-            wordList.Add("FIVE");
+            /*wordList.Clear();
+            wordList.Add("FOURZ");
+            wordList.Add("FIVEZ");
+            wordList.Add("EAST");
+            wordList.Add("TITLE");*/
+           
 
             SubSolutions subSolutions = new SubSolutions(wordList, 2, ipDic, nipDic, ppw);
             Grid grid = new Grid(rows, cols, ipDic, nipDic, ppw);
@@ -2027,33 +2026,38 @@ namespace SIT323
             Grid g = grid;
             if (subSolutions == null)
             {
+                g.SetScore();
                 return g;
             }
 
             SubSolution bestSubSolution = subSolutions.GetBestSubSolution();
-            subSolutions.Remove(bestSubSolution);
             if (bestSubSolution == null)
             {
                 return g;
             }
+
+            subSolutions.Remove(bestSubSolution);
+            
             List<Grid> grids = grid.Insert(bestSubSolution);
             if (grids == null)
             {
                 return getMaxGrid(rows, cols, ipDic, nipDic, ppw, subSolutions, grid);
             }
-            int max = 0;
-            for(int i = 0; i < grids.Count; i++)
-            {
-                Grid tempGrid=getMaxGrid(rows, cols, ipDic, nipDic, ppw, subSolutions, grids[i]);
-                tempGrid.SetScore();
-                if (max < tempGrid.Score)
-                {
-                    g = tempGrid;
-                    max = tempGrid.Score;
-                }
-            }
+            //int max = 0;
+            //for(int i = 0; i < grids.Count; i++)
+            //{
+            //    Grid tempGrid=getMaxGrid(rows, cols, ipDic, nipDic, ppw, subSolutions, grids[i]);
+            //    tempGrid.SetScore();
+            //    if (max < tempGrid.Score)
+            //    {
+            //        g = tempGrid;
+            //        max = tempGrid.Score;
+            //    }
+            //}
 
-            return g;
+            return getMaxGrid(rows, cols, ipDic, nipDic, ppw, subSolutions, grids[0]);
+
+           //return g;
         }
 
         private static int[] SameElement(List<String> wordList)

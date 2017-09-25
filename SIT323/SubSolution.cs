@@ -13,6 +13,7 @@ namespace SIT323
         public SubSolution(int row, int col,Dictionary<char,int> iwd, Dictionary<char, int> niwd,int ppw) : base(row,col, iwd, niwd, ppw)
         {
             points = new List<Point>();
+            
         }
 
         public List<Point> Points { get => points;}

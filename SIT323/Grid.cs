@@ -10,6 +10,7 @@ namespace SIT323
     {
         protected int row;
         protected int col;
+        protected List<String> wordList;
         protected char[,] arrayGrid;
 
         protected int score = 0;
@@ -20,8 +21,9 @@ namespace SIT323
         public int PointsPerWord { get => pointsPerWord; set => pointsPerWord = value; }
         public Dictionary<char, int> Iwd { get => iwd; set => iwd = value; }
         public Dictionary<char, int> Niwd { get => niwd; set => niwd = value; }
-        public int Score { get => score;}
+        public int Score { get => score; set => score = value; }
         public char[,] ArrayGrid { get => arrayGrid; set => arrayGrid = value; }
+        public List<string> WordList { get => wordList; set => wordList = value; }
 
         public enum Direction
         {
@@ -31,6 +33,7 @@ namespace SIT323
 
         public Grid(int row, int col, Dictionary<char, int> iwd, Dictionary<char, int> niwd, int pointsPerWord)
         {
+            wordList = new List<string>();
             this.iwd = iwd;
             this.niwd = niwd;
             this.pointsPerWord = pointsPerWord;
@@ -191,7 +194,8 @@ namespace SIT323
                     arrayGrid[r+i, c] = word[i];
                 }
             }
-
+            wordList.Add(word);
+            SetScore();
             return true;
         }
 
@@ -199,7 +203,7 @@ namespace SIT323
         {
             /**
              *  This method is to insert a subSolution to the gird.
-             *  Return different grids of different ways of insertion.
+             *  Return different grids in different ways of insertion.
              * */
 
             List<Grid> grids = null;
@@ -211,6 +215,7 @@ namespace SIT323
             }
 
             bool gridIsEmpty = true;
+            bool inserted = false;      // When "word group" == 1, no need to consider insert into the space.
 
             // First, find the letter which has the maximize weight in the gird. Try to insert, if ok return. If not, then find the second maximize weight point. Try to insert...
             while (temp.Count > 0)
@@ -240,6 +245,7 @@ namespace SIT323
                     // Following code is similar as GetPointByLetter. 
                     foreach(Point p in subSolution.Points)
                     {
+                        // Copyt grid to tempGrid.
                         Grid tempGrid = new Grid(row, col,iwd,niwd,pointsPerWord);
                         for (int i = 0; i < row; i++)
                         {
@@ -248,6 +254,11 @@ namespace SIT323
                                 tempGrid.arrayGrid[i, j] = arrayGrid[i, j];
                             }
                         }
+                        List<String> wl = new List<string>();
+                        wl.AddRange(wordList);
+                        tempGrid.Score = score;
+                        tempGrid.PointsPerWord = pointsPerWord;
+                        tempGrid.WordList = wl;
 
                         if (letter == p.Letter)
                         {
@@ -262,16 +273,30 @@ namespace SIT323
                                     int col_in_grid = gridP.Column + (solutionP.Column - isp.Column);
                                     tempGrid.arrayGrid[row_in_grid, col_in_grid] = solutionP.Letter;
                                 }
+
+                                tempGrid.SetScore();
+                                foreach(String word in subSolution.WordList)
+                                {
+                                    if (!tempGrid.WordList.Contains(word))
+                                    {
+                                        tempGrid.WordList.Add(word);
+                                    }
+                                }
+
                                 if (grids == null)
                                 {
                                     grids = new List<Grid>();
                                 }
                                 grids.Add(tempGrid);
+                                inserted = true;
                             }
                         }
                     }
                 }
-                break;
+                if (inserted)
+                {
+                    break;
+                }
             }
 
             if (gridIsEmpty)
@@ -280,6 +305,7 @@ namespace SIT323
                 {
                     for(int c = 0; c < col; c++)
                     {
+                        ///////////////////
                         Point p = subSolution.Points[0];
                         Grid tempGrid = new Grid(row, col, iwd, niwd, pointsPerWord);
                         for (int i = 0; i < row; i++)
@@ -290,22 +316,39 @@ namespace SIT323
                             }
                         }
 
+                        List<String> wl = new List<string>();
+                        wl.AddRange(wordList);
+                        tempGrid.Score = score;
+                        tempGrid.PointsPerWord = pointsPerWord;
+                        tempGrid.WordList = wl;
+
                         Point isp = new Point(p.Row, p.Column, p.Letter);
                         if (CanBeInserted(r, c, isp, subSolution))
                         {
                             // Body of insertion.
-                            // Have not concerned first time to insert.
+                            // First time to insert.
                             foreach (Point solutionP in subSolution.Points)
                             {
                                 int row_in_grid = r + (solutionP.Row - isp.Row);
                                 int col_in_grid = c + (solutionP.Column - isp.Column);
                                 tempGrid.arrayGrid[row_in_grid, col_in_grid] = solutionP.Letter;
                             }
+
+                            tempGrid.SetScore();
+                            foreach (String word in subSolution.WordList)
+                            {
+                                if (!tempGrid.WordList.Contains(word))
+                                {
+                                    tempGrid.WordList.Add(word);
+                                }
+                            }
+
                             if (grids == null)
                             {
                                 grids = new List<Grid>();
                             }
                             grids.Add(tempGrid);
+                            inserted = true;
                         }
                     }
                 }

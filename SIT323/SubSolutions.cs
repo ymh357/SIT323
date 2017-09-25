@@ -65,7 +65,7 @@ namespace SIT323
                                         SubSolution subSolution = new SubSolution(longer, longer, iwd, niwd, pointsPerWord);
                                         subSolution.AddWord(row, col, hWord, Grid.Direction.HORIZENTAL);
                                         subSolution.AddWord(row - j, i + col, vWord, Grid.Direction.VERTICAL);
-                                        
+
                                         subSolution.SetPoints();
                                         subSolution.SetScore();
                                         solutions.Add(subSolution);
@@ -81,7 +81,26 @@ namespace SIT323
 
         public void Remove(SubSolution subSolution)
         {
-            solutions.Remove(subSolution);
+            /**
+             * This method is to remove all the subSolutions contain certain words.
+             * */
+            List<String> words = subSolution.WordList;
+            List<SubSolution> temp = new List<SubSolution>();
+            foreach(SubSolution sub in solutions)
+            {
+                foreach(String word in words)
+                {
+                    if (sub.WordList.Contains(word))
+                    {
+                        temp.Add(sub);
+                        break;
+                    }
+                }
+            }
+            foreach(SubSolution sub in temp)
+            {
+                solutions.Remove(sub);
+            }
         }
 
         public SubSolution GetBestSubSolution()
